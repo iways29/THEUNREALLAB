@@ -19,7 +19,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-syne), 'Syne', sans-serif;
   overflow-x: hidden;
   cursor: none;
 }
@@ -192,7 +192,7 @@ body::before {
 .product-card:hover .product-visual { opacity: 0.1; }
 
 .pill {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-dm-mono), 'DM Mono', monospace;
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;

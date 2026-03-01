@@ -9,10 +9,16 @@ export default function Footer() {
       alignItems: "center",
       justifyContent: "space-between",
     }}>
-      <a href="#" style={{
+      <a href="/" style={{
         fontSize: 13, fontWeight: 700, letterSpacing: "0.1em",
         textTransform: "uppercase", color: "var(--muted)", textDecoration: "none",
+        display: "flex", alignItems: "center", gap: 8,
       }}>
+        <img
+          src="/the-unreal-lab-icon.svg"
+          alt=""
+          style={{ width: 22, height: 22 }}
+        />
         The Unreal Lab
       </a>
 

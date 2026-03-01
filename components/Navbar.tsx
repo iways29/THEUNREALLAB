@@ -33,14 +33,11 @@ export default function Navbar() {
         textTransform: "uppercase", color: "var(--text)", textDecoration: "none",
         display: "flex", alignItems: "center", gap: 10,
       }}>
-        <div style={{
-          width: 22, height: 22, background: "var(--accent)",
-          borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M6 1L11 6L6 11L1 6L6 1Z" fill="#080808" />
-          </svg>
-        </div>
+        <img
+          src="/the-unreal-lab-icon.svg"
+          alt=""
+          style={{ width: 28, height: 28 }}
+        />
         The Unreal Lab
       </Link>
 

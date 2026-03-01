@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160">
+  <defs>
+    <!-- Main accent glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Diamond gradient -->
+    <linearGradient id="diamondFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8ff47"/>
+      <stop offset="100%" stop-color="#c8e000"/>
+    </linearGradient>
+    <!-- Subtle diamond edge -->
+    <linearGradient id="innerDiamond" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080808"/>
+      <stop offset="100%" stop-color="#1a1a00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background (transparent) -->
+  <rect width="480" height="160" fill="transparent"/>
+
+  <!-- === LOGOMARK === -->
+  <!-- Outer diamond (accent yellow) -->
+  <polygon
+    points="44,10 78,44 44,78 10,44"
+    fill="url(#diamondFill)"
+    filter="url(#softglow)"
+  />
+  <!-- Inner diamond (dark cutout) -->
+  <polygon
+    points="44,22 66,44 44,66 22,44"
+    fill="url(#innerDiamond)"
+  />
+  <!-- Center dot (accent) -->
+  <circle cx="44" cy="44" r="6" fill="#e8ff47" filter="url(#glow)"/>
+
+  <!-- Subtle corner accents on outer diamond -->
+  <polygon points="44,10 50,16 44,16" fill="rgba(0,0,0,0.3)"/>
+  <polygon points="78,44 72,50 72,44" fill="rgba(0,0,0,0.3)"/>
+
+  <!-- === WORDMARK === -->
+  <!-- "THE" small label -->
+  <text
+    x="106"
+    y="36"
+    font-family="'DM Mono', 'Courier New', monospace"
+    font-size="11"
+    font-weight="400"
+    letter-spacing="4"
+    fill="#555555"
+    text-anchor="start"
+  >THE</text>
+
+  <!-- "UNREAL" main word -->
+  <text
+    x="104"
+    y="76"
+    font-family="'Syne', 'Arial Black', sans-serif"
+    font-size="42"
+    font-weight="800"
+    letter-spacing="-1"
+    fill="#f0f0f0"
+    text-anchor="start"
+  >UNREAL</text>
+
+  <!-- "LAB" — outlined/ghost style -->
+  <text
+    x="104"
+    y="112"
+    font-family="'Syne', 'Arial Black', sans-serif"
+    font-size="42"
+    font-weight="800"
+    letter-spacing="-1"
+    fill="none"
+    stroke="rgba(255,255,255,0.22)"
+    stroke-width="1"
+    text-anchor="start"
+  >LAB</text>
+
+  <!-- Accent line under UNREAL -->
+  <line x1="104" y1="82" x2="400" y2="82" stroke="#e8ff47" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Tagline -->
+  <text
+    x="104"
+    y="138"
+    font-family="'DM Mono', 'Courier New', monospace"
+    font-size="9.5"
+    font-weight="400"
+    letter-spacing="3.5"
+    fill="#444444"
+    text-anchor="start"
+  >WE MAKE THE UNREAL REAL</text>
+
+</svg>

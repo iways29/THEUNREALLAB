@@ -32,8 +32,8 @@ export default function Footer() {
       <div style={{ display: "flex", gap: 28 }}>
         {[
           ["https://mumba.ai", "Mumba.ai"],
-          ["mailto:ceo@mumba.ai", "Contact"],
-          ["https://twitter.com/theunreallab", "Twitter"],
+          ["mailto:ishanpanchaal@theunreallab.com", "Contact"],
+          ["https://mumba.ai", "MUMBAAI"],
         ].map(([href, label]) => (
           <a
             key={label}

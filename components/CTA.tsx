@@ -73,7 +73,7 @@ export default function CTA() {
           </a>
 
           <a
-            href="mailto:ceo@mumba.ai"
+            href="mailto:ishanpanchaal@theunreallab.com"
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               color: "#888", fontSize: 14, fontWeight: 500,

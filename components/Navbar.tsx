@@ -42,7 +42,7 @@ export default function Navbar() {
       </Link>
 
       <ul style={{ display: "flex", gap: 40, listStyle: "none" }}>
-        {[["#products", "Products"], ["#about", "About"], ["mailto:ceo@mumba.ai", "Contact"]].map(([href, label]) => (
+        {[["#products", "Products"], ["#about", "About"], ["mailto:ishanpanchaal@theunreallab.com", "Contact"]].map(([href, label]) => (
           <li key={label}>
             <a href={href} style={{
               fontSize: 13, color: "var(--muted)", textDecoration: "none",

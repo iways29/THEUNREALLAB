@@ -4,20 +4,20 @@ const pills = ["AI Research", "Product Design", "Engineering", "Startups", "Ente
 
 export default function Manifesto() {
   return (
-    <section id="about" style={{
+    <section id="about" className="section-pad" style={{
       padding: "140px 48px",
       borderTop: "1px solid var(--border)",
       position: "relative",
       overflow: "hidden",
     }}>
-      <div style={{
+      <div className="manifesto-grid" style={{
         maxWidth: 1280, margin: "0 auto",
         display: "grid",
         gridTemplateColumns: "1fr 1.6fr",
         gap: 120, alignItems: "start",
       }}>
         {/* Left — sticky */}
-        <div className="reveal" style={{ position: "sticky", top: 120 }}>
+        <div className="reveal manifesto-sticky" style={{ position: "sticky", top: 120 }}>
           <div style={{
             fontFamily: "'DM Mono', monospace", fontSize: 11,
             letterSpacing: "0.2em", color: "var(--muted)", marginBottom: 20,

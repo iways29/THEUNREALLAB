@@ -9,7 +9,7 @@ export default function Hero() {
       alignItems: "center",
       justifyContent: "center",
       position: "relative",
-      padding: "0 48px",
+      padding: "0 clamp(20px, 5vw, 48px)",
       textAlign: "center",
       overflow: "hidden",
     }}>
@@ -24,18 +24,21 @@ export default function Hero() {
         marginBottom: 32,
         display: "flex", alignItems: "center", gap: 12,
       }}>
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block" }} />
+        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
         Building the future
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block" }} />
+        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
       </div>
 
       {/* Title */}
       <h1 className="animate-fade-up-2" style={{
-        fontSize: "clamp(64px, 9vw, 130px)",
+        fontSize: "clamp(48px, 12vw, 130px)",
         fontWeight: 800,
         lineHeight: 0.92,
         letterSpacing: "-0.03em",
         marginBottom: 32,
+        overflowWrap: "anywhere",
+        minWidth: 0,
+        width: "100%",
       }}>
         We Make
         <br />
@@ -54,7 +57,7 @@ export default function Hero() {
 
       {/* Subtitle */}
       <p className="animate-fade-up-3" style={{
-        maxWidth: 520, fontSize: 17, lineHeight: 1.65,
+        maxWidth: 520, fontSize: "clamp(14px, 2vw, 17px)", lineHeight: 1.65,
         color: "#888", fontWeight: 400, marginBottom: 52,
       }}>
         A product studio at the edge of AI and human experience.
@@ -62,7 +65,7 @@ export default function Hero() {
       </p>
 
       {/* CTAs */}
-      <div className="animate-fade-up-4" style={{ display: "flex", gap: 16, alignItems: "center" }}>
+      <div className="animate-fade-up-4 hero-ctas" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
         <a href="#products" style={{
           display: "inline-flex", alignItems: "center", gap: 10,
           background: "var(--accent)", color: "var(--bg)",
@@ -70,6 +73,7 @@ export default function Hero() {
           letterSpacing: "0.08em", textTransform: "uppercase",
           padding: "16px 32px", borderRadius: 4, textDecoration: "none",
           transition: "transform 0.25s, box-shadow 0.25s",
+          whiteSpace: "nowrap",
         }}
           onMouseEnter={e => {
             e.currentTarget.style.transform = "translateY(-2px)";
@@ -90,6 +94,7 @@ export default function Hero() {
           color: "#888", fontSize: 14, fontWeight: 500,
           letterSpacing: "0.04em", textDecoration: "none",
           transition: "color 0.2s", padding: "16px 0",
+          whiteSpace: "nowrap",
         }}
           onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
           onMouseLeave={e => e.currentTarget.style.color = "#888"}

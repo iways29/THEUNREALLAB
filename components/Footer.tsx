@@ -2,7 +2,7 @@
 
 export default function Footer() {
   return (
-    <footer style={{
+    <footer className="footer-inner" style={{
       borderTop: "1px solid var(--border)",
       padding: "40px 48px",
       display: "flex",
@@ -29,7 +29,7 @@ export default function Footer() {
         © {new Date().getFullYear()} The Unreal Lab. All rights reserved.
       </div>
 
-      <div style={{ display: "flex", gap: 28 }}>
+      <div className="footer-links" style={{ display: "flex", gap: 28 }}>
         {[
           ["https://mumba.ai", "Mumba.ai"],
           ["mailto:ishanpanchaal@theunreallab.com", "Contact"],

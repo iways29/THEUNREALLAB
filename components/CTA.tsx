@@ -15,7 +15,7 @@ export default function CTA() {
         pointerEvents: "none",
       }} />
 
-      <div className="reveal" style={{
+      <div className="reveal cta-box" style={{
         maxWidth: 900, margin: "0 auto",
         border: "1px solid var(--border)",
         borderRadius: 16, padding: 80,
@@ -44,7 +44,7 @@ export default function CTA() {
           Explore Mumba.ai and experience what AI conversations should feel like.
         </p>
 
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", alignItems: "center" }}>
+        <div className="cta-buttons" style={{ display: "flex", gap: 16, justifyContent: "center", alignItems: "center" }}>
           <a
             href="https://mumba.ai"
             target="_blank"

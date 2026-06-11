@@ -14,14 +14,19 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-syne), 'Syne', sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
   cursor: none;
+}
+
+@media (pointer: coarse) {
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
 }
 
 body::before {
@@ -77,7 +82,7 @@ body::before {
   to { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 24s linear infinite;
+  animation: marquee 14s linear infinite;
   white-space: nowrap;
   display: flex;
 }
@@ -203,3 +208,65 @@ body::before {
   transition: color 0.2s, border-color 0.2s;
 }
 .pill:hover { color: var(--accent); border-color: rgba(232,255,71,0.3); }
+
+/* ── Navbar ── */
+.nav-inner { padding: 28px 48px; }
+
+/* ── Product card inner layout (desktop) ── */
+.card-body { padding: 56px; }
+.mumba-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; }
+.ashvaa-inner { display: grid; grid-template-columns: 1fr 560px; gap: 72px; align-items: center; }
+.teaser-inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  /* Navbar */
+  .nav-links { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+  .nav-inner {
+    padding: 14px 20px;
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+  .nav-wordmark { display: none; }
+
+  /* Section paddings */
+  #products { padding: 60px 20px !important; }
+  #about { padding: 60px 20px !important; }
+
+  /* Card body */
+  .card-body { padding: 24px 20px; }
+
+
+
+  /* Mumba → stack */
+  .mumba-inner { grid-template-columns: 1fr; gap: 32px; }
+
+  /* ASHVAA → stack, video full width */
+  .ashvaa-inner { grid-template-columns: 1fr; gap: 28px; }
+  .ashvaa-video { aspect-ratio: 16 / 9; }
+
+  /* Teaser → stack, hide redacted */
+  .teaser-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .teaser-redacted { display: none; }
+
+  /* Manifesto → single column */
+  .manifesto-grid {
+    grid-template-columns: 1fr !important;
+    gap: 48px !important;
+  }
+  .manifesto-sticky { position: static !important; }
+
+  /* CTA box */
+  .cta-box { padding: 36px 24px !important; }
+  .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
+  .cta-buttons a { text-align: center; justify-content: center; }
+
+  /* Footer → stacked */
+  .footer-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
+    padding: 32px 20px !important;
+  }
+  .footer-links { flex-wrap: wrap; gap: 16px !important; }
+}

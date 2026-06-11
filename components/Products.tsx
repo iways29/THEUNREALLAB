@@ -147,24 +147,66 @@ export default function Products() {
           <div className="product-visual">M</div>
         </ProductCard>
 
-        {/* Coming soon 1 */}
-        <ProductCard style={{
-          padding: 56, display: "flex", alignItems: "center",
-          justifyContent: "center", flexDirection: "column",
-          textAlign: "center", minHeight: 320,
-        }}>
+        {/* ASHVAA */}
+        <ProductCard style={{ padding: 56, minHeight: 320 }}>
           <div style={{
-            width: 64, height: 64, border: "1px solid var(--border-bright)",
-            borderRadius: 12, display: "flex", alignItems: "center",
-            justifyContent: "center", marginBottom: 24, opacity: 0.5,
+            display: "inline-flex", alignItems: "center", gap: 6,
+            fontFamily: "'DM Mono', monospace", fontSize: 10,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "var(--accent)", border: "1px solid rgba(232,255,71,0.2)",
+            borderRadius: 2, padding: "4px 10px", marginBottom: 28,
           }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <span className="tag-dot" />
+            Open Source
           </div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#444", marginBottom: 8 }}>Next Product</div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: "0.15em", textTransform: "uppercase" }}>In the lab · 2025</div>
+
+          <div style={{
+            fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em",
+            marginBottom: 14, lineHeight: 1,
+          }}>
+            ASHVAA
+          </div>
+
+          <p style={{
+            fontSize: 14, color: "#666", lineHeight: 1.65,
+            marginBottom: 32, maxWidth: 300,
+          }}>
+            Codebase intelligence tool. Point it at any GitHub repo and get an interactive dependency graph, security vulnerability detection, dead code analysis, and AI-powered explanations.
+          </p>
+
+          <div style={{ display: "flex", gap: 24, marginBottom: 36, borderTop: "1px solid var(--border)", paddingTop: 24 }}>
+            {[["Graph", "Dep. Viz"], ["Scan", "Security"], ["AI", "Insights"]].map(([num, label]) => (
+              <div key={label}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "var(--accent)", letterSpacing: "-0.01em" }}>{num}</div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          <a
+            href="https://github.com/iways29/ASHVAA"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              fontSize: 13, fontWeight: 600, letterSpacing: "0.06em",
+              textTransform: "uppercase", color: "var(--text)",
+              textDecoration: "none", transition: "gap 0.2s, color 0.2s",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.gap = "14px";
+              e.currentTarget.style.color = "var(--accent)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.gap = "8px";
+              e.currentTarget.style.color = "var(--text)";
+            }}
+          >
+            View on GitHub
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
         </ProductCard>
 
         {/* Coming soon 2 */}

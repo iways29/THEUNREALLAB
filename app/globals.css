@@ -89,6 +89,32 @@ a:hover {
   background: var(--ink);
 }
 
+.stage__videos {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* Once the scrub canvas has frames for every scene it takes the stage. */
+.scrub-ready .stage__videos {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.scrub-ready .stage__canvas {
+  opacity: 1;
+}
+
 .stage__layer {
   position: absolute;
   inset: 0;
@@ -132,7 +158,11 @@ a:hover {
   justify-content: space-between;
   padding: 20px clamp(20px, 4vw, 56px);
   color: var(--paper);
-  background: linear-gradient(to bottom, rgba(16, 12, 8, 0.55), rgba(16, 12, 8, 0));
+  background: linear-gradient(
+    to bottom,
+    rgba(16, 12, 8, calc(0.55 + 0.35 * var(--nav-veil, 0))),
+    rgba(16, 12, 8, calc(0.12 * var(--nav-veil, 0)))
+  );
 }
 
 .nav__mark {
@@ -297,21 +327,36 @@ a:hover {
   z-index: 1;
 }
 
-.section {
-  min-height: 100vh;
-  display: flex;
-  position: relative;
+/* Scroll travel each scene gets on top of its one viewport of content.
+   This is the Phase 2 scrub budget: more travel, slower camera. */
+:root {
+  --scene-travel: 100vh;
 }
 
-.section--center {
+.section {
+  position: relative;
+  min-height: calc(100vh + var(--scene-travel));
+}
+
+/* The content stays pinned for the length of the section while the scene
+   underneath scrubs, so the camera moves as far as the user scrolls. */
+.pin {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.pin--center {
   align-items: center;
 }
 
-.section--bottom {
+.pin--bottom {
   align-items: flex-end;
 }
 
-.section--column {
+.pin--column {
   flex-direction: column;
   justify-content: flex-end;
 }
@@ -841,59 +886,14 @@ a:hover {
   color: var(--body);
 }
 
-/* ── motion: reveal + hero intro ────────────────────────────── */
+/* ── motion ─────────────────────────────────────────────────── */
 
-[data-reveal] {
+/* Opacity and transform for every choreographed element are written each
+   frame by SceneEngine from lib/choreography.ts. Nothing starts hidden in
+   CSS, so the page is still readable if the script never runs. */
+
+[data-motion-hidden] {
   opacity: 0;
-  transform: translateY(34px);
-  transition: opacity 1s ease, transform 1s var(--ease);
-}
-
-[data-reveal][data-delay="1"] {
-  transition-delay: 0.1s;
-}
-
-[data-reveal].is-in {
-  opacity: 1;
-  transform: none;
-}
-
-.verse-card[data-reveal] {
-  transform: translateY(24px);
-  transition: opacity 1.2s ease 0.6s, transform 1.2s ease 0.6s;
-}
-
-[data-intro] {
-  opacity: 0;
-}
-
-[data-intro="eyebrow"] {
-  transition: opacity 1.1s ease 0.2s;
-}
-
-[data-intro="sub"] {
-  transform: translateY(16px);
-  transition: opacity 1s ease 0.9s, transform 1s ease 0.9s;
-}
-
-[data-intro="cta"] {
-  transition: opacity 1s ease 1.2s;
-}
-
-[data-intro].is-in {
-  opacity: 1;
-  transform: none;
-}
-
-.hero__word {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 1s ease, transform 1s var(--ease);
-}
-
-.hero__word.is-in {
-  opacity: 1;
-  transform: none;
 }
 
 /* ── custom cursor ──────────────────────────────────────────── */
@@ -945,17 +945,18 @@ html.has-cursor button {
     scroll-behavior: auto;
   }
 
+  /* No scrub, so no scroll travel to pay for: one viewport per scene. */
+  :root {
+    --scene-travel: 0px;
+  }
+
   .scroll-hint__line {
     animation: none;
     opacity: 0.6;
   }
 
-  [data-reveal],
-  [data-intro],
-  .hero__word,
-  .verse-card[data-reveal] {
-    opacity: 1;
-    transform: none;
+  .stage__videos,
+  .stage__canvas {
     transition: none;
   }
 
@@ -963,7 +964,33 @@ html.has-cursor button {
     transform: none;
   }
 
-  .stage__layer {
+  .stage__videos {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* Once the scrub canvas has frames for every scene it takes the stage. */
+.scrub-ready .stage__videos {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.scrub-ready .stage__canvas {
+  opacity: 1;
+}
+
+.stage__layer {
     transform: none !important;
   }
 }

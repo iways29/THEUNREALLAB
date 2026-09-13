@@ -27,7 +27,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/00-chariot.jpg",
     clip: "/scenes/00-chariot.mp4",
     exitClip: "/scenes/00-chariot-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/00-chariot", count: 41 },
   },
   {
     id: "promise",
@@ -35,7 +35,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/01-counsel.jpg",
     clip: "/scenes/01-counsel.mp4",
     exitClip: "/scenes/01-counsel-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/01-counsel", count: 41 },
   },
   {
     id: "practice",
@@ -43,7 +43,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/02-bow.jpg",
     clip: "/scenes/02-bow.mp4",
     exitClip: "/scenes/02-bow-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/02-bow", count: 65 },
   },
   {
     id: "room",
@@ -51,7 +51,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/03-assembly.jpg",
     clip: "/scenes/03-assembly.mp4",
     exitClip: "/scenes/03-assembly-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/03-assembly", count: 45 },
   },
   {
     id: "fund",
@@ -59,7 +59,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/04-raigad.jpg",
     clip: "/scenes/04-raigad.mp4",
     exitClip: "/scenes/04-raigad-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/04-raigad", count: 38 },
   },
   {
     id: "apply",
@@ -67,7 +67,7 @@ export const SCENES: Scene[] = [
     poster: "/scenes/05-conch.jpg",
     clip: "/scenes/05-conch.mp4",
     exitClip: "/scenes/05-conch-exit.mp4",
-    frames: null,
+    frames: { dir: "/frames/05-conch", count: 44 },
   },
 ];
 

@@ -1,6 +1,5 @@
 import Nav from "@/components/Nav";
 import Stage from "@/components/Stage";
-import SceneEngine from "@/components/SceneEngine";
 import Cursor from "@/components/Cursor";
 import Hero from "@/components/Hero";
 import ThePromise from "@/components/ThePromise";
@@ -23,7 +22,6 @@ export default function Home() {
         <TheFund />
         <TheConch />
       </main>
-      <SceneEngine />
       <Cursor />
     </>
   );

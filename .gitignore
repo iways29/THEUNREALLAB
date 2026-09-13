@@ -36,8 +36,3 @@ next-env.d.ts
 .DS_Store
 THEUNREALLAB.code-workspace
 
-# Scrub frames (1017 WebP x2 sizes, ~90MB). Generated from
-# ~/Downloads/theunreal_frames by the encode script described in
-# public/scenes/README.md; hosting (CDN / LFS) is still an open decision.
-public/frames/
-public/frames-sm/

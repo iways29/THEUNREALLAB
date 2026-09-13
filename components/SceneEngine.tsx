@@ -19,20 +19,6 @@ const ENTER_BAND = 0.2;
 const EXIT_BAND = 0.16;
 const NAV_H = 72;
 
-/**
- * Where the veil's dark focus sits for each scene, as viewport fractions.
- * Bottom for the scenes whose copy sits low, left or right for the ones
- * whose copy sits to a side. The engine slides between them.
- */
-const VEIL: [number, number][] = [
-  [0.5, 1.08],
-  [-0.05, 0.55],
-  [1.05, 0.55],
-  [0.72, 1.0],
-  [-0.05, 0.55],
-  [0.45, 1.08],
-];
-
 type Tracked = {
   el: HTMLElement;
   scene: number;
@@ -110,7 +96,6 @@ export default function SceneEngine({
       document.querySelectorAll<HTMLElement>("[data-scene-layer]")
     );
     const bar = document.querySelector<HTMLElement>("[data-progress]");
-    const veil = document.querySelector<HTMLElement>("[data-veil]");
     const rail = document.querySelector<HTMLElement>("[data-rail]");
     const railItems = Array.from(
       document.querySelectorAll<HTMLElement>("[data-rail-item]")
@@ -290,19 +275,6 @@ export default function SceneEngine({
             else if (opacity <= 0.02 && !video.paused) video.pause();
           }
         });
-      }
-
-      // The veil's focus slides between scenes around each cut, so the dark
-      // side of the frame moves with the copy instead of switching.
-      if (veil) {
-        const k = Math.max(0, Math.min(stageT - 0.5, lastIndex));
-        const i = Math.floor(k);
-        const j = Math.min(i + 1, lastIndex);
-        const f = smoothstep(clamp01(k - i));
-        const vx = VEIL[i][0] + (VEIL[j][0] - VEIL[i][0]) * f;
-        const vy = VEIL[i][1] + (VEIL[j][1] - VEIL[i][1]) * f;
-        veil.style.setProperty("--vx", `${(vx * 100).toFixed(2)}%`);
-        veil.style.setProperty("--vy", `${(vy * 100).toFixed(2)}%`);
       }
 
       const elapsed = now - t0;

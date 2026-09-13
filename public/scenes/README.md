@@ -25,10 +25,9 @@ footage, which `lib/useFrameScrub.ts` dissolves over the last 9% of the
 outgoing scene.
 
 Frames live in `public/frames/0001.webp … 1017.webp` (1280×720, WebP q82,
-unsharp-masked) with a mobile set in `public/frames-sm/` (640×360). They are
-**git-ignored** — ~90 MB is more than this connection can push — so they need
-a CDN or Git LFS before deploy. Without them the site falls back to the
-posters and clips above.
+unsharp-masked) with a mobile set in `public/frames-sm/` (640×360), committed
+in chunks of frames so each push stays small. Without them the site falls
+back to the posters and clips above.
 
 To regenerate from the exported JPGs:
 

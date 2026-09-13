@@ -11,9 +11,7 @@ import { SCENES } from "@/lib/scenes";
  * (Phase 2), and six video layers that loop each scene's clip (Phase 1). The
  * videos carry the stage until the canvas has a first frame for every scene,
  * and under prefers-reduced-motion they stay put showing static posters.
- * One veil sits over both: a dark radial whose focus SceneEngine slides
- * between scenes, so the copy always has ink behind it and the light never
- * jumps at a section edge. The film grain sits over everything.
+ * A faint bottom gradient and the film grain sit over whichever is live.
  *
  * SceneEngine drives both, and lives here so it can be handed the canvas ref
  * directly rather than hunting for the element in the DOM.
@@ -48,7 +46,7 @@ export default function Stage() {
           ))}
         </div>
         <canvas ref={canvasRef} className="stage__canvas" data-scene-canvas />
-        <div className="veil" data-veil />
+        <div className="veil" />
         <div className="grain" />
       </div>
       <SceneEngine canvasRef={canvasRef} />

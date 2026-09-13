@@ -1,0 +1,11 @@
+[
+  {
+    "date": "2026-07-12",
+    "macrostructure": "Specimen Gallery (custom)",
+    "theme": "studied-DNA",
+    "theme_source": "oryzo.ai (user-supplied extraction: tokens-3.json)",
+    "theme_axes": "dark #100904 / geometric-sans upper 500 / warm ember #dc5000",
+    "enrichment": "live Three.js specimens (tree + graph) — Tier A code-drawn",
+    "brief": "THEUNREALLAB — warm-dark editorial rebuild, museum specimen gallery for Mumba.ai + ASHVAA + unnamed third"
+  }
+]

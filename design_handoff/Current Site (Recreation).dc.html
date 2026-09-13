@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#080808; color:#f0f0f0; font-family:'Syne',sans-serif; overflow-x:clip; }
+  a { color:#f0f0f0; }
+  a:hover { color:#e8ff47; }
+  @keyframes marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes glowPulse { 0%,100% { opacity:.6; transform:translate(-50%,-50%) scale(1); } 50% { opacity:1; transform:translate(-50%,-50%) scale(1.05); } }
+  @keyframes scrollPulse { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+</style>
+</helmet>
+<div style="background:#080808; color:#f0f0f0; font-family:'Syne',sans-serif; position:relative; overflow:clip">
+
+  <div style="position:absolute; inset:0; z-index:1000; pointer-events:none; opacity:.4; background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E&quot;)"></div>
+
+  <nav style="position:absolute; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:28px 48px; border-bottom:1px solid transparent">
+    <a href="#top" style="font-size:15px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; display:flex; align-items:center; gap:8px; flex-shrink:0">
+      <img src="public/the-unreal-lab-icon.svg" alt="" style="width:24px; height:24px; flex-shrink:0">
+      <span>The Unreal Lab</span>
+    </a>
+    <ul style="display:flex; gap:40px; list-style:none; margin:0; padding:0">
+      <li><a href="#products" style="font-size:13px; color:#555; text-decoration:none; letter-spacing:.06em; text-transform:uppercase" style-hover="color:#f0f0f0">Products</a></li>
+      <li><a href="#about" style="font-size:13px; color:#555; text-decoration:none; letter-spacing:.06em; text-transform:uppercase" style-hover="color:#f0f0f0">About</a></li>
+      <li><a href="mailto:ishanpanchaal@theunreallab.com" style="font-size:13px; color:#555; text-decoration:none; letter-spacing:.06em; text-transform:uppercase" style-hover="color:#f0f0f0">Contact</a></li>
+    </ul>
+    <a href="#products" style="font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#080808; background:#e8ff47; padding:10px 22px; border-radius:4px; text-decoration:none">Explore →</a>
+  </nav>
+
+  <section id="top" style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:0 48px; text-align:center; overflow:hidden">
+    <div style="position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size:80px 80px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%)"></div>
+    <div style="position:absolute; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle, rgba(232,255,71,.06) 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; animation:glowPulse 6s ease-in-out infinite"></div>
+
+    <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:#e8ff47; margin-bottom:32px; display:flex; align-items:center; gap:12px; animation:fadeUp .8s .2s both">
+      <span style="width:40px; height:1px; background:#e8ff47; opacity:.5; display:block; flex-shrink:0"></span>
+      Building the future
+      <span style="width:40px; height:1px; background:#e8ff47; opacity:.5; display:block; flex-shrink:0"></span>
+    </div>
+
+    <h1 style="font-size:clamp(48px,12vw,130px); font-weight:800; line-height:.92; letter-spacing:-.03em; margin:0 0 32px; width:100%; overflow-wrap:anywhere; animation:fadeUp .9s .35s both">
+      We Make<br>
+      <span style="display:block; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.3)">The <span style="color:#e8ff47; -webkit-text-stroke:0px">Unreal</span></span>
+      Real
+    </h1>
+
+    <p style="max-width:520px; font-size:17px; line-height:1.65; color:#888; font-weight:400; margin:0 0 52px; animation:fadeUp .9s .5s both">A product studio at the edge of AI and human experience. We build tools that shouldn't exist yet.</p>
+
+    <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:center; animation:fadeUp .9s .65s both">
+      <a href="#products" style="display:inline-flex; align-items:center; gap:10px; background:#e8ff47; color:#080808; font-size:14px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:16px 32px; border-radius:4px; text-decoration:none; white-space:nowrap; transition:transform .25s, box-shadow .25s" style-hover="transform:translateY(-2px); box-shadow:0 20px 60px rgba(232,255,71,.3)">
+        Explore our products
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </a>
+      <a href="#about" style="display:inline-flex; align-items:center; gap:8px; color:#888; font-size:14px; font-weight:500; letter-spacing:.04em; text-decoration:none; padding:16px 0; white-space:nowrap" style-hover="color:#f0f0f0">
+        Our mission
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+      </a>
+    </div>
+
+    <div style="position:absolute; bottom:40px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; animation:fadeIn 1s 1.2s both">
+      <div style="width:1px; height:60px; background:linear-gradient(to bottom, transparent, #555); animation:scrollPulse 2s ease-in-out infinite"></div>
+      <span style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#555; writing-mode:vertical-rl; transform:rotate(180deg)">Scroll</span>
+    </div>
+  </section>
+
+  <div style="border-top:1px solid rgba(255,255,255,.07); border-bottom:1px solid rgba(255,255,255,.07); overflow:hidden; padding:18px 0; background:#0d0d0d">
+    <div style="animation:marquee 14s linear infinite; white-space:nowrap; display:flex">
+      <sc-for list="{{ marqueeItems }}" as="item" hint-placeholder-count="14">
+        <span style="display:inline-flex; align-items:center; gap:20px; padding:0 40px; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#555">
+          {{ item }}
+          <span style="width:4px; height:4px; border-radius:50%; background:#e8ff47; opacity:.6; flex-shrink:0"></span>
+        </span>
+      </sc-for>
+    </div>
+  </div>
+
+  <section id="products" style="padding:140px 48px; max-width:1280px; margin:0 auto">
+    <div>
+      <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:#e8ff47; margin-bottom:20px; display:flex; align-items:center; gap:12px">
+        Our Products
+        <span style="width:80px; height:1px; background:rgba(255,255,255,.07); display:block"></span>
+      </div>
+      <h2 style="font-size:clamp(32px,5vw,64px); font-weight:800; line-height:1; letter-spacing:-.025em; margin:0 0 80px; max-width:600px">Tools built to <span style="color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.3)">change</span> the way you think</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.07); border-radius:12px; overflow:hidden">
+
+      <div style="grid-column:1 / -1; background:#080808; position:relative; overflow:hidden; transition:background .3s" style-hover="background:#111111">
+        <div style="padding:56px">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:end">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#e8ff47; border:1px solid rgba(232,255,71,.2); border-radius:2px; padding:4px 10px; margin-bottom:36px">
+                <span style="width:5px; height:5px; border-radius:50%; background:#e8ff47; animation:blink 2s ease-in-out infinite; flex-shrink:0"></span>
+                Live · Flagship
+              </div>
+              <div style="font-size:42px; font-weight:800; letter-spacing:-.02em; margin-bottom:16px; line-height:1">Mumba.ai</div>
+              <p style="font-size:15px; color:#666; line-height:1.6; margin:0 0 40px; max-width:340px">The world's first tree-based conversation interface. No more context collapse. No more lost threads. Every conversation branches, grows, and stays coherent — forever.</p>
+              <a href="https://mumba.ai" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; transition:gap .2s, color .2s" style-hover="gap:14px; color:#e8ff47">
+                Launch App
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </a>
+            </div>
+            <div>
+              <div style="display:flex; gap:32px; padding-top:32px; border-top:1px solid rgba(255,255,255,.07)">
+                <div>
+                  <div style="font-size:28px; font-weight:800; color:#e8ff47; letter-spacing:-.02em">∞</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:11px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:2px">Context Depth</div>
+                </div>
+                <div>
+                  <div style="font-size:28px; font-weight:800; color:#e8ff47; letter-spacing:-.02em">0%</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:11px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:2px">Context Lost</div>
+                </div>
+                <div>
+                  <div style="font-size:28px; font-weight:800; color:#e8ff47; letter-spacing:-.02em">AI+</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:11px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:2px">Powered</div>
+                </div>
+              </div>
+              <p style="margin:28px 0 0; font-size:14px; color:#555; line-height:1.7">Conversations aren't linear — so why should your AI be? Mumba reimagines the chat interface as a living tree where ideas branch, connect, and never get lost.</p>
+            </div>
+          </div>
+          <div style="position:absolute; right:-20px; bottom:-20px; opacity:.06; font-size:160px; font-weight:800; line-height:1; letter-spacing:-.05em; pointer-events:none; user-select:none; font-family:'Syne',sans-serif">M</div>
+        </div>
+      </div>
+
+      <div style="grid-column:1 / -1; background:#080808; position:relative; overflow:hidden; transition:background .3s" style-hover="background:#111111">
+        <div style="padding:56px">
+          <div style="display:grid; grid-template-columns:1fr 560px; gap:72px; align-items:center">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#e8ff47; border:1px solid rgba(232,255,71,.2); border-radius:2px; padding:4px 10px; margin-bottom:28px">
+                <span style="width:5px; height:5px; border-radius:50%; background:#e8ff47; animation:blink 2s ease-in-out infinite; flex-shrink:0"></span>
+                Open Source
+              </div>
+              <div style="font-size:42px; font-weight:800; letter-spacing:-.02em; margin-bottom:14px; line-height:1">ASHVAA</div>
+              <p style="font-size:15px; color:#666; line-height:1.65; margin:0 0 40px; max-width:420px">Codebase intelligence tool. Point it at any GitHub repo and get an interactive dependency graph, security vulnerability detection, dead code analysis, and AI-powered explanations.</p>
+              <div style="display:flex; gap:32px; margin-bottom:40px; border-top:1px solid rgba(255,255,255,.07); padding-top:28px">
+                <div>
+                  <div style="font-size:22px; font-weight:800; color:#e8ff47; letter-spacing:-.01em">Graph</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:10px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:4px">Dep. Viz</div>
+                </div>
+                <div>
+                  <div style="font-size:22px; font-weight:800; color:#e8ff47; letter-spacing:-.01em">Scan</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:10px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:4px">Security</div>
+                </div>
+                <div>
+                  <div style="font-size:22px; font-weight:800; color:#e8ff47; letter-spacing:-.01em">AI</div>
+                  <div style="font-family:'DM Mono',monospace; font-size:10px; color:#555; letter-spacing:.1em; text-transform:uppercase; margin-top:4px">Insights</div>
+                </div>
+              </div>
+              <a href="https://github.com/iways29/ASHVAA" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; transition:gap .2s, color .2s" style-hover="gap:14px; color:#e8ff47">
+                View on GitHub
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </a>
+            </div>
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.15); aspect-ratio:504 / 399; position:relative; background:#0d0d0d">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#333; text-align:center; padding:24px">LinkedIn embed<br>ASHVAA demo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="grid-column:1 / -1; min-height:280px; background:#080808; position:relative; overflow:hidden; transition:background .3s" style-hover="background:#111111">
+        <div style="padding:56px">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:40px">
+            <div style="min-width:0">
+              <div style="display:inline-flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#444; border:1px solid #222; border-radius:2px; padding:4px 10px; margin-bottom:28px">
+                <span style="width:5px; height:5px; border-radius:50%; background:#333; flex-shrink:0"></span>
+                In the lab
+              </div>
+              <div style="font-size:42px; font-weight:800; letter-spacing:-.02em; line-height:1; margin-bottom:16px; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.12)">Something<br>Unreal</div>
+              <p style="font-size:14px; color:#333; line-height:1.65; margin:0; max-width:340px">The next thing we're building hasn't been named yet. It'll ship when it's ready — and not a day before.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:14px; opacity:.35; flex-shrink:0">
+              <div style="font-family:'DM Mono',monospace; font-size:12px; color:#555; letter-spacing:.05em; filter:blur(2px)">████████████ ██████</div>
+              <div style="font-family:'DM Mono',monospace; font-size:12px; color:#555; letter-spacing:.05em; filter:blur(2px)">███████ ████ ██████████</div>
+              <div style="font-family:'DM Mono',monospace; font-size:12px; color:#555; letter-spacing:.05em; filter:blur(2px)">██████████████</div>
+              <div style="font-family:'DM Mono',monospace; font-size:12px; color:#555; letter-spacing:.05em; filter:blur(2px)">█████ ███████ ████</div>
+              <div style="margin-top:8px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#2a2a2a">CLASSIFIED · ACCESS DENIED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="about" style="padding:140px 48px; border-top:1px solid rgba(255,255,255,.07); position:relative; overflow:hidden">
+    <div style="max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1fr 1.6fr; gap:120px; align-items:start">
+      <div style="position:sticky; top:120px">
+        <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em; color:#555; margin-bottom:20px">01 / About</div>
+        <h2 style="font-size:42px; font-weight:800; line-height:1.05; letter-spacing:-.02em; margin:0">We build what<br><span style="color:#e8ff47">doesn't</span> exist yet</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:40px">
+          <sc-for list="{{ pills }}" as="p" hint-placeholder-count="5">
+            <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:#555; border:1px solid #222; border-radius:2px; padding:8px 14px; transition:color .2s, border-color .2s" style-hover="color:#e8ff47; border-color:rgba(232,255,71,.3)">{{ p }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:19px; line-height:1.8; color:#777; font-weight:400; margin:0 0 28px"><strong>The Unreal Lab is a product studio obsessed with the edges.</strong> The problems that seem impossible. The interfaces that don't make sense yet. The AI behaviors that haven't been named.</p>
+        <p style="font-size:19px; line-height:1.8; color:#777; font-weight:400; margin:0 0 28px">We sit at the intersection of <strong>AI research and product craft</strong> — building things that feel like they're from five years in the future, shipping them today.</p>
+        <p style="font-size:19px; line-height:1.8; color:#777; font-weight:400; margin:0 0 28px">Our first product, <strong>Mumba.ai</strong>, solves one of the most fundamental problems in human-AI interaction: context collapse. As AI conversations grow, they lose coherence. We built a new architecture to fix that forever.</p>
+        <p style="font-size:19px; line-height:1.8; color:#777; font-weight:400; margin:0 0 28px">This is just the beginning. We have more experiments running in the lab — tools that will change how people think, collaborate, and create with AI.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:100px 48px 140px; text-align:center; position:relative; overflow:hidden">
+    <div style="position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(232,255,71,.04) 0%, transparent 100%); pointer-events:none"></div>
+    <div style="max-width:900px; margin:0 auto; border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:80px; position:relative; background:#0d0d0d">
+      <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:#e8ff47; margin-bottom:28px">Get Involved</div>
+      <h2 style="font-size:clamp(36px,5vw,58px); font-weight:800; letter-spacing:-.025em; line-height:1.05; margin:0 0 20px">Ready to try the future?</h2>
+      <p style="font-size:16px; color:#666; margin:0 auto 44px; max-width:400px; line-height:1.6">Explore Mumba.ai and experience what AI conversations should feel like.</p>
+      <div style="display:flex; gap:16px; justify-content:center; align-items:center">
+        <a href="https://mumba.ai" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:10px; background:#e8ff47; color:#080808; font-size:14px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:16px 32px; border-radius:4px; text-decoration:none; transition:transform .25s, box-shadow .25s" style-hover="transform:translateY(-2px); box-shadow:0 20px 60px rgba(232,255,71,.3)">
+          Launch Mumba.ai
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </a>
+        <a href="mailto:ishanpanchaal@theunreallab.com" style="display:inline-flex; align-items:center; gap:8px; color:#888; font-size:14px; font-weight:500; letter-spacing:.04em; text-decoration:none; padding:16px 0" style-hover="color:#f0f0f0">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid rgba(255,255,255,.07); padding:40px 48px; display:flex; align-items:center; justify-content:space-between">
+    <a href="#top" style="font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#555; text-decoration:none; display:flex; align-items:center; gap:8px">
+      <img src="public/the-unreal-lab-icon.svg" alt="" style="width:22px; height:22px">
+      The Unreal Lab
+    </a>
+    <div style="font-family:'DM Mono',monospace; font-size:11px; color:#333; letter-spacing:.08em">© 2026 The Unreal Lab. All rights reserved.</div>
+    <div style="display:flex; gap:28px">
+      <a href="https://mumba.ai" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#444; text-decoration:none; letter-spacing:.05em" style-hover="color:#f0f0f0">Mumba.ai</a>
+      <a href="mailto:ishanpanchaal@theunreallab.com" style="font-size:12px; color:#444; text-decoration:none; letter-spacing:.05em" style-hover="color:#f0f0f0">Contact</a>
+      <a href="https://mumba.ai" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#444; text-decoration:none; letter-spacing:.05em" style-hover="color:#f0f0f0">MUMBAAI</a>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const items = ["AI-Native Products","Conversational Intelligence","Context-Aware Systems","Human-Centered Design","Enterprise-Grade AI","Tree-Based Architecture","The Unreal Lab"];
+    return {
+      marqueeItems: [...items, ...items],
+      pills: ["AI Research","Product Design","Engineering","Startups","Enterprise"],
+    };
+  }
+}
+</script>
+</body>
+</html>

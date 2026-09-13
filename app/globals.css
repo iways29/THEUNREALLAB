@@ -1,272 +1,1659 @@
-@import "tailwindcss";
+/* The Unreal Lab — venture studio
+ * Recreated from design_handoff/"The Unreal Lab v3.dc.html".
+ * Tokens, type scale, spacing and easing per design_handoff/README.md.
+ * Radius 0 everywhere; no shadows — light comes from the scrims.
+ */
 
 :root {
-  --bg: #080808;
-  --bg2: #0d0d0d;
-  --surface: #111111;
-  --border: rgba(255,255,255,0.07);
-  --border-bright: rgba(255,255,255,0.15);
-  --text: #f0f0f0;
-  --muted: #555;
-  --accent: #e8ff47;
-  --accent2: #47ffd4;
-  --glow: rgba(232, 255, 71, 0.15);
+  /* palette */
+  --ink: #100c08;
+  --paper: #f4efe4;
+  --body: #eadfc4;
+  --gold: #e6c76a;
+
+  /* rules / borders */
+  --rule-hair: rgba(244, 239, 228, 0.18);
+  --rule: rgba(244, 239, 228, 0.2);
+  --rule-card: rgba(244, 239, 228, 0.22);
+  --rule-row: rgba(244, 239, 228, 0.25);
+  --rule-strong: rgba(244, 239, 228, 0.6);
+
+  /* panels */
+  --panel-veil: rgba(16, 12, 8, 0.38);
+  --panel: rgba(16, 12, 8, 0.55);
+  --panel-deep: rgba(16, 12, 8, 0.6);
+
+  /* type */
+  --serif: var(--font-caslon), Georgia, serif;
+  --sans: var(--font-archivo), Helvetica, sans-serif;
+  --deva: var(--font-tiro), Georgia, serif;
+
+  /* layout */
+  --shell: 1500px;
+  --gutter: clamp(20px, 5vw, 72px);
+  --band: clamp(120px, 16vh, 180px);
+
+  /* motion */
+  --ease: cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; overflow-x: clip; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-syne), 'Syne', sans-serif;
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-weight: 400;
   overflow-x: clip;
-  cursor: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (pointer: coarse) {
-  body { cursor: auto; }
-  .cursor, .cursor-ring { display: none; }
+a {
+  color: var(--paper);
 }
 
-body::before {
-  content: '';
+a:hover {
+  color: var(--gold);
+}
+
+::selection {
+  background: rgba(230, 199, 106, 0.3);
+  color: var(--paper);
+}
+
+@keyframes pulseLine {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* ── stage ──────────────────────────────────────────────────── */
+
+.stage {
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0.4;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--ink);
 }
 
-.cursor {
-  width: 8px; height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-  will-change: transform;
-}
-.cursor-ring {
-  width: 32px; height: 32px;
-  border: 1px solid rgba(232,255,71,0.4);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transition: width 0.2s, height 0.2s, border-color 0.2s;
-  will-change: transform;
-}
-.cursor-ring.hovered {
-  width: 48px;
-  height: 48px;
-  border-color: rgba(232,255,71,0.8);
+.stage__videos {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.6s ease;
 }
 
-.reveal {
+/* Once the scrub canvas has frames for every scene it takes the stage. */
+.scrub-ready .stage__videos {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+  pointer-events: none;
 }
 
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+.stage__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease;
 }
-.marquee-track {
-  animation: marquee 14s linear infinite;
+
+.scrub-ready .stage__canvas {
+  opacity: 1;
+}
+
+.stage__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.stage__layer:first-of-type {
+  opacity: 1;
+}
+
+.stage__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-position: center;
+  background-size: cover;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+/* ── nav ────────────────────────────────────────────────────── */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px clamp(20px, 4vw, 56px);
+  color: var(--paper);
+  background: linear-gradient(
+    to bottom,
+    rgba(16, 12, 8, calc(0.55 + 0.35 * var(--nav-veil, 0))),
+    rgba(16, 12, 8, calc(0.12 * var(--nav-veil, 0)))
+  );
+}
+
+.nav__mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--paper);
+}
+
+.nav__mark:hover {
+  color: var(--paper);
+}
+
+.diamond {
+  display: block;
+  width: 11px;
+  height: 11px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex: none;
+}
+
+.wordmark {
   white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 36px);
+}
+
+.nav__link {
+  position: relative;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--paper);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.25s var(--ease);
+}
+
+.nav__link:hover {
+  opacity: 1;
+  color: var(--paper);
+}
+
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease);
+}
+
+.nav__link:hover::after,
+.nav__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.nav__link.is-active {
+  opacity: 1;
+}
+
+.nav__cta {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-decoration: none;
+  border: 1px solid var(--rule-strong);
+  padding: 10px 18px;
+  white-space: nowrap;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.nav__cta:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 36px);
+}
+
+.nav__burger {
+  display: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--paper);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.nav__burger span {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: currentColor;
+  transition: transform 0.3s var(--ease), opacity 0.2s ease;
+}
+
+.nav__burger[aria-expanded="true"] span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.nav__burger[aria-expanded="true"] span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+.nav__sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 790;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 var(--gutter);
+  background: rgba(16, 12, 8, 0.94);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.nav__sheet a {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(28px, 8vw, 44px);
+  text-decoration: none;
+  color: var(--paper);
+  padding: 10px 0;
+}
+
+@media (max-width: 767px) {
+  .nav__links {
+    display: none;
+  }
+  .nav__burger {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav__sheet {
+    display: none;
+  }
+}
+
+/* ── progress line ──────────────────────────────────────────── */
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--gold);
+  z-index: 850;
+}
+
+/* ── content shell ──────────────────────────────────────────── */
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Scroll travel each scene gets on top of its one viewport of content: the
+   film's scrub budget. Shorter than a full viewport so the copy of one scene
+   is still leaving as the next arrives, and the page reads as one flow. */
+:root {
+  --scene-travel: 70vh;
+}
+
+.section {
+  position: relative;
+  min-height: calc(100vh + var(--scene-travel));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* The opening already spent the chariot's frames; the hero only needs enough
+   travel for its copy to leave before the cut. */
+.section--hero {
+  justify-content: flex-start;
+  min-height: calc(100vh + 28vh);
+}
+
+.section--end {
+  justify-content: flex-end;
+}
+
+/* Nothing is pinned. A block scrolls through at the page's own speed, the
+   choreography lifts and fades it at the viewport edges, and the film keeps
+   moving underneath the whole time. */
+.pin {
+  position: relative;
+  width: 100%;
   display: flex;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
-  50% { opacity: 1; transform: translate(-50%,-50%) scale(1.05); }
-}
-@keyframes scroll-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-@keyframes blink {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.3; }
+.pin--center {
+  align-items: center;
 }
 
-.animate-fade-up-1 { animation: fadeUp 0.8s 0.2s both; }
-.animate-fade-up-2 { animation: fadeUp 0.9s 0.35s both; }
-.animate-fade-up-3 { animation: fadeUp 0.9s 0.5s both; }
-.animate-fade-up-4 { animation: fadeUp 0.9s 0.65s both; }
-.animate-fade-in-delayed { animation: fadeIn 1s 1.2s both; }
-
-.hero-glow {
-  position: absolute;
-  width: 700px; height: 700px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  animation: glow-pulse 6s ease-in-out infinite;
+.pin--bottom {
+  min-height: 100vh;
+  min-height: 100svh;
+  align-items: flex-end;
 }
 
-.hero-grid {
+.pin--column {
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* A faint bottom gradient is all that sits over the film, so the paintings
+   stay bright; panels and labels carry their own ink where they need it.
+   SceneEngine raises --veil-hero while the hero copy is on screen, deepening
+   and lifting the gradient so the headline reads over the bright painting. */
+.veil {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 80px 80px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(16, 12, 8, calc(0.42 + 0.32 * var(--veil-hero, 0))) 0%,
+    rgba(16, 12, 8, calc(0.22 * var(--veil-hero, 0))) calc(34% + 20% * var(--veil-hero, 0)),
+    rgba(16, 12, 8, 0) calc(34% + 34% * var(--veil-hero, 0))
+  );
 }
 
-.scroll-line {
-  width: 1px;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, var(--muted));
-  animation: scroll-pulse 2s ease-in-out infinite;
+.container {
+  position: relative;
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--band) var(--gutter);
 }
 
-.tag-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: blink 2s ease-in-out infinite;
-  flex-shrink: 0;
+/* The chapter rail lives in the right gutter on wide screens. */
+@media (min-width: 1024px) {
+  .container {
+    padding-right: calc(var(--gutter) + 72px);
+  }
 }
 
-.product-card {
-  background: var(--bg);
+.container--hero {
+  padding-top: clamp(100px, 16vh, 140px);
+  padding-bottom: clamp(40px, 7vh, 80px);
+}
+
+.hero__copy {
+  max-width: 900px;
+}
+
+.container--end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.container--room {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(28px, 5vw, 96px);
+  align-items: end;
+}
+
+.container--conch {
+  padding-top: clamp(140px, 18vh, 220px);
+  padding-bottom: clamp(48px, 7vh, 80px);
+}
+
+/* ── type ───────────────────────────────────────────────────── */
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.eyebrow__rule {
+  display: block;
+  width: 44px;
+  height: 1px;
+  background: var(--gold);
+  flex: none;
+}
+
+.eyebrow__text {
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+
+.label {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+}
+
+.h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(42px, 6.6vw, 112px);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 17ch;
+  text-wrap: pretty;
+}
+
+.h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(34px, 5.4vw, 86px);
+  line-height: 1;
+  letter-spacing: -0.018em;
+  margin: 0 0 30px;
+  text-wrap: pretty;
+}
+
+.h2--tight {
+  font-size: clamp(34px, 5vw, 80px);
+}
+
+.h2--conch {
+  font-size: clamp(38px, 6.4vw, 104px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  max-width: 12ch;
+  margin: 0 0 clamp(36px, 6vh, 64px);
+}
+
+.prose {
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--body);
+  max-width: 52ch;
+}
+
+.prose--wide {
+  max-width: 54ch;
+}
+
+.prose:last-child {
+  margin-bottom: 0;
+}
+
+/* ── hero ───────────────────────────────────────────────────── */
+
+.hero__word {
+  display: inline-block;
+  white-space: pre;
+}
+
+.hero__word--gold {
+  color: var(--gold);
+}
+
+.hero__sub {
+  margin: clamp(22px, 3.2vh, 36px) 0 0;
+  max-width: 46ch;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.7;
+  color: var(--body);
+}
+
+.hero__cta {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.4vw, 36px);
+  flex-wrap: wrap;
+  margin-top: clamp(24px, 4vh, 44px);
+}
+
+/* The second door, for the ones who back rather than build. */
+.hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-decoration: none;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--rule-strong);
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.hero__link:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 20px 30px;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease);
+}
+
+.button:hover {
+  color: var(--ink);
+}
+
+.scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.75;
+}
+
+.scroll-hint__text {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.scroll-hint__line {
+  display: block;
+  width: 52px;
+  height: 1px;
+  background: var(--paper);
+  animation: pulseLine 2.6s ease-in-out infinite;
+}
+
+/* ── reading veil ───────────────────────────────────────────── */
+
+/* A soft ink ellipse behind a block of copy. SceneEngine writes --focus as
+   the block is hovered or sits in the reading band of the viewport, so the
+   veil comes and goes with attention instead of sitting on the painting. */
+.prose,
+.verse,
+.h2 {
+  position: relative;
+}
+
+.prose::before,
+.verse::before,
+.h2::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -26px -44px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(16, 12, 8, 0.66) 0%,
+    rgba(16, 12, 8, 0.42) 44%,
+    rgba(16, 12, 8, 0) 72%
+  );
+  opacity: var(--focus, 0);
+}
+
+/* ── verse ──────────────────────────────────────────────────── */
+
+.verse-card {
+  max-width: 420px;
+  padding: 28px 30px;
+  border: 1px solid var(--rule-card);
+  background: var(--panel-veil);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.verse-card__deva {
+  font-family: var(--deva);
+  font-size: clamp(18px, 1.5vw, 22px);
+  line-height: 1.7;
+  color: var(--paper);
+}
+
+/* The Sanskrit inks in from the left: SceneEngine writes --ink each frame.
+   With no script it is fully inked, so the verse always reads. */
+.verse-card__deva,
+.verse__deva {
+  --ink: 1;
+  background-image: linear-gradient(
+    100deg,
+    var(--paper) 0%,
+    var(--paper) calc(var(--ink) * 100%),
+    rgba(244, 239, 228, 0.16) calc(var(--ink) * 100% + 16%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.verse-card__gloss {
+  margin-top: 16px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.verse-card__source {
+  margin-top: 12px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.verse {
+  border-left: 1px solid var(--gold);
+  padding-left: 22px;
+}
+
+.verse__deva {
+  font-family: var(--deva);
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.7;
+}
+
+.verse__gloss {
+  margin-top: 8px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--body);
+}
+
+.verse__source {
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ── cards ──────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  gap: 1px;
+  background: var(--rule-hair);
+}
+
+.grid--practice {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+.grid--stages {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  margin-bottom: 34px;
+}
+
+.grid--conch {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  background: var(--rule);
+}
+
+/* The card itself is what the scroll choreography moves; its panel, the
+   .bento inside, is what the pointer moves (see BentoCard). */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card .bento {
+  flex: 1;
+  padding: clamp(24px, 2.6vw, 36px);
+}
+
+.card--stage .bento {
+  padding: 22px 24px;
+}
+
+.card__number {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(34px, 3vw, 48px);
+  line-height: 1;
+  color: var(--gold);
+  margin-bottom: 18px;
+}
+
+.card__label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.card__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--body);
+}
+
+.card__body a {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.card__stage-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.card__stage-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(20px, 1.8vw, 26px);
+}
+
+.card__stage-note {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--body);
+}
+
+/* ── the room list ──────────────────────────────────────────── */
+
+.rows {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--rule-row);
+}
+
+.row {
   position: relative;
   overflow: hidden;
-  transition: background 0.3s;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule-row);
+  transition: padding-left 0.45s var(--ease), border-color 0.45s ease;
+}
+
+/* The cream band that flows in under the pointer (ReactBits FlowingMenu). */
+.row__band {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+  color: var(--ink);
+  transform: translate3d(0, 101%, 0);
+}
+
+.row__track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: fit-content;
+  will-change: transform;
+}
+
+.row__part {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 18px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.row__part em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+  line-height: 1;
+}
+
+.row__part i {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(16, 12, 8, 0.62);
+}
+
+.row__part .diamond {
+  width: 8px;
+  height: 8px;
+}
+
+.row:hover {
+  padding-left: 14px;
+  border-color: var(--gold);
+}
+
+.row__name {
+  transition: color 0.3s ease;
+}
+
+.row:hover .row__name {
+  color: var(--gold);
+}
+
+.row__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+}
+
+.row__note {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--body);
+  align-self: center;
+}
+
+/* ── conch cards ────────────────────────────────────────────── */
+
+.conch-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--paper);
+}
+
+.conch-card .bento {
+  flex: 1;
+  padding: clamp(28px, 3vw, 44px);
+  background: var(--panel-deep);
+  transition: background 0.4s ease;
+}
+
+.conch-card:hover {
+  color: var(--paper);
+}
+
+.conch-card:hover .bento {
+  background: rgba(244, 239, 228, 0.1);
+}
+
+.conch-card__label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.conch-card__title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(24px, 2.4vw, 36px);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.conch-card__body {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--body);
+  max-width: 44ch;
+}
+
+.conch-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ── footer ─────────────────────────────────────────────────── */
+
+.footer {
+  margin-top: clamp(48px, 8vh, 96px);
+  border-top: 1px solid var(--rule);
+  padding-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.footer__mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.footer__mark .diamond {
+  width: 10px;
+  height: 10px;
+}
+
+.footer__line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--body);
+}
+
+.footer__links {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.footer__links a {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--body);
+  text-decoration: none;
+}
+
+.footer__links a:hover {
+  color: var(--paper);
+}
+
+.footer__copy {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--body);
+}
+
+/* ── motion ─────────────────────────────────────────────────── */
+
+/* Opacity and transform for every choreographed element are written each
+   frame by SceneEngine from lib/choreography.ts. Only the hero starts hidden:
+   it waits for the film, and a flash of copy before the engine's first frame
+   would spoil the opening. Reduced motion shows it outright. */
+
+[data-motion-hidden] {
+  opacity: 0;
+}
+
+.nav {
+  animation: navIn 1.6s var(--ease) both;
+}
+
+@keyframes navIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── reduced motion: static posters, no parallax or drift ───── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* No scrub, so no scroll travel to pay for: one viewport per scene. */
+  :root {
+    --scene-travel: 0px;
+    --veil-hero: 1;
+  }
+
+  [data-motion-hidden] {
+    opacity: 1;
+  }
+
+  .nav {
+    animation: none;
+  }
+
+  .scroll-hint__line {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .stage__videos,
+  .stage__canvas {
+    transition: none;
+  }
+
+  .glare-hover:hover {
+    transform: none;
+  }
+
+  .stage__layer {
+    transform: none !important;
+  }
+
+  .particles,
+  .click-spark,
+  .splash {
+    display: none;
+  }
+
+  .shiny-gold {
+    animation: none;
+    color: var(--gold);
+    -webkit-text-fill-color: var(--gold);
+  }
+
+  .verse__deva,
+  .verse-card__deva {
+    --ink: 1;
+  }
+}
+
+/* ── split text (ReactBits SplitText, gsap masks) ───────────── */
+
+/* gsap wraps each word in an overflow-clipped mask while it rises. The
+   italic Caslon overhangs and descends past its box, so the mask is padded
+   out and pulled back with negative margins to leave the layout alone. */
+.split-word-mask {
+  padding: 0.08em 0.14em 0.22em 0.1em;
+  margin: -0.08em -0.14em -0.22em -0.1em;
+}
+
+.split-word {
+  will-change: transform;
+}
+
+.h1__text {
+  display: inline;
+}
+
+/* ── shine on the gold word (ReactBits ShinyText, CSS) ──────── */
+
+.shiny-gold {
+  background-image: linear-gradient(
+    110deg,
+    var(--gold) 0%,
+    var(--gold) 42%,
+    #fff1b8 50%,
+    var(--gold) 58%,
+    var(--gold) 100%
+  );
+  background-size: 260% 100%;
+  background-position: 120% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shine 7.5s cubic-bezier(0.4, 0, 0.2, 1) 2.2s infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 120% 0;
+  }
+  32% {
+    background-position: -120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+/* ── bento panels (ReactBits MagicBento) ────────────────────── */
+
+.bento {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  will-change: transform;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow: 0;
+}
+
+.bento > :not(.bento__layer) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Interior light under the pointer. */
+.bento::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    360px circle at var(--glow-x) var(--glow-y),
+    rgba(230, 199, 106, 0.24),
+    transparent 70%
+  );
+  opacity: var(--glow);
+  transition: opacity 0.5s ease;
+}
+
+/* Border glow: a gold radial masked down to a one-pixel frame. */
+.bento::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    340px circle at var(--glow-x) var(--glow-y),
+    rgba(230, 199, 106, 1) 0%,
+    rgba(230, 199, 106, 0.45) 40%,
+    transparent 70%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: var(--glow);
+  transition: opacity 0.4s ease;
+}
+
+.bento__layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.bento__mote {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 6px rgba(230, 199, 106, 0.6);
+}
+
+.bento__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(230, 199, 106, 0.32) 0%,
+    rgba(230, 199, 106, 0.14) 30%,
+    transparent 70%
+  );
+}
+
+/* ── blur-in copy (ReactBits BlurText) ──────────────────────── */
+
+.blur-word {
+  display: inline-block;
+}
+
+/* ── glare (ReactBits GlareHover) ───────────────────────────── */
+
+.glare-hover {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  transition: transform 0.35s var(--ease);
+}
+
+.glare-hover:hover {
+  transform: translateY(-3px);
+}
+
+.glare-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--gh-angle, -35deg),
+    transparent 58%,
+    var(--gh-rgba, rgba(230, 199, 106, 0.55)) 70%,
+    transparent 82%
+  );
+  background-size: var(--gh-size, 260%) var(--gh-size, 260%);
+  background-repeat: no-repeat;
+  background-position: -100% -100%;
+  transition: background-position var(--gh-duration, 700ms) ease;
+}
+
+.glare-hover:hover::before {
+  background-position: 100% 100%;
+}
+
+/* ── body copy ink-in (ReactBits ScrollReveal) ──────────────── */
+
+.reveal-word {
+  display: inline;
+  will-change: opacity;
+}
+
+/* ── gold dust (ReactBits Particles, OGL) ───────────────────── */
+
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.particles canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── click sparks (ReactBits ClickSpark) ────────────────────── */
+
+.click-spark {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  pointer-events: none;
+}
+
+/* ── the archer's aim (ReactBits TargetCursor) ──────────────── */
+
+html.has-cursor,
+html.has-cursor body,
+html.has-cursor a,
+html.has-cursor button {
   cursor: none;
 }
-.product-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.product-card:hover { background: var(--surface); }
-.product-card:hover::before { opacity: 1; }
 
-.card-glow {
-  position: absolute;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(232,255,71,0.05) 0%, transparent 70%);
+.target-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 9999;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-  transform: translate(-50%, -50%);
 }
-.product-card:hover .card-glow { opacity: 1; }
 
-.product-visual {
+.target-cursor-dot {
   position: absolute;
-  right: -20px; bottom: -20px;
-  opacity: 0.06;
-  font-size: 160px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  pointer-events: none;
-  user-select: none;
-  transition: opacity 0.3s;
-  font-family: 'Syne', sans-serif;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: translate(-50%, -50%) rotate(45deg);
+  will-change: transform;
 }
-.product-card:hover .product-visual { opacity: 0.1; }
 
-.pill {
-  font-family: var(--font-dm-mono), 'DM Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.15em;
+.target-cursor-corner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--paper);
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.corner-tl {
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.corner-tr {
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.corner-br {
+  border-left: 0;
+  border-top: 0;
+}
+
+.corner-bl {
+  border-right: 0;
+  border-top: 0;
+}
+
+.target-cursor-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(14px, 12px);
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: #555;
-  border: 1px solid #222;
-  border-radius: 2px;
-  padding: 8px 14px;
-  transition: color 0.2s, border-color 0.2s;
+  color: var(--gold);
+  white-space: nowrap;
+  opacity: 0;
 }
-.pill:hover { color: var(--accent); border-color: rgba(232,255,71,0.3); }
 
-/* ── Navbar ── */
-.nav-inner { padding: 28px 48px; }
+/* ── chapter rail ───────────────────────────────────────────── */
 
-/* ── Product card inner layout (desktop) ── */
-.card-body { padding: 56px; }
-.mumba-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; }
-.ashvaa-inner { display: grid; grid-template-columns: 1fr 560px; gap: 72px; align-items: center; }
-.teaser-inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.rail {
+  position: fixed;
+  right: clamp(18px, 2.4vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 10px 0;
+}
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  /* Navbar */
-  .nav-links { display: none !important; }
-  .nav-hamburger { display: flex !important; }
-  .nav-inner {
-    padding: 14px 20px;
-    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+.rail__track {
+  position: absolute;
+  right: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 1px;
+  background: var(--rule);
+}
+
+.rail__dot {
+  position: absolute;
+  right: -3px;
+  top: calc(var(--t, 0) * 100%);
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.rail__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 16px;
+  text-decoration: none;
+  color: var(--paper);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.rail__item:hover,
+.rail__item.is-active {
+  opacity: 1;
+  color: var(--paper);
+}
+
+.rail__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.3s ease, transform 0.4s var(--ease);
+}
+
+.rail:hover .rail__name,
+.rail__item.is-active .rail__name {
+  opacity: 1;
+  transform: none;
+}
+
+.rail__tick {
+  display: block;
+  width: 16px;
+  height: 1px;
+  background: var(--paper);
+  transition: width 0.4s var(--ease), background 0.3s ease;
+}
+
+.rail__item.is-active .rail__tick {
+  width: 32px;
+  background: var(--gold);
+}
+
+/* ── frame counter ──────────────────────────────────────────── */
+
+.frame-counter {
+  position: fixed;
+  left: clamp(20px, 4vw, 56px);
+  bottom: 20px;
+  z-index: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--body);
+  opacity: 0.72;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.frame-counter__scene {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--paper);
+}
+
+.frame-counter b {
+  font-weight: 500;
+  color: var(--gold);
+}
+
+@media (max-width: 1023px) {
+  .rail {
+    display: none;
   }
-  .nav-wordmark { display: none; }
+}
 
-  /* Section paddings */
-  #products { padding: 60px 20px !important; }
-  #about { padding: 60px 20px !important; }
-
-  /* Card body */
-  .card-body { padding: 24px 20px; }
-
-
-
-  /* Mumba → stack */
-  .mumba-inner { grid-template-columns: 1fr; gap: 32px; }
-
-  /* ASHVAA → stack, video full width */
-  .ashvaa-inner { grid-template-columns: 1fr; gap: 28px; }
-  .ashvaa-video { aspect-ratio: 16 / 9; }
-
-  /* Teaser → stack, hide redacted */
-  .teaser-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .teaser-redacted { display: none; }
-
-  /* Manifesto → single column */
-  .manifesto-grid {
-    grid-template-columns: 1fr !important;
-    gap: 48px !important;
+@media (max-width: 767px) {
+  .frame-counter {
+    display: none;
   }
-  .manifesto-sticky { position: static !important; }
 
-  /* CTA box */
-  .cta-box { padding: 36px 24px !important; }
-  .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
-  .cta-buttons a { text-align: center; justify-content: center; }
-
-  /* Footer → stacked */
-  .footer-inner {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 20px !important;
-    padding: 32px 20px !important;
+  .container--hero {
+    padding-top: 112px;
   }
-  .footer-links { flex-wrap: wrap; gap: 16px !important; }
+}
+
+/* ── seal (ReactBits CircularText) ──────────────────────────── */
+
+.seal {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin-left: 4px;
+}
+
+.seal__ring {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.seal__ring span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  text-align: center;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--body);
+  line-height: 1;
+  padding-top: 2px;
+  transform-origin: 50% 50%;
+}
+
+.seal__core {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.seal__core .diamond {
+  width: 9px;
+  height: 9px;
+}
+
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid var(--rule-card);
+  border-radius: 50%;
+}
+
+/* ── ribbon (ReactBits ScrollVelocity) ──────────────────────── */
+
+.ribbon {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: clamp(28px, 8vh, 96px);
+  padding: 8px 0;
+  border-top: 1px solid var(--rule-hair);
+  border-bottom: 1px solid var(--rule-hair);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.ribbon__scroller {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.ribbon__copy {
+  flex: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(30px, 4.6vw, 72px);
+  line-height: 1.25;
+  color: var(--paper);
+  opacity: 0.42;
+  padding-right: 0.6em;
+}
+
+/* ── variable proximity (ReactBits VariableProximity) ───────── */
+
+.vp-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.vp-char {
+  display: inline-block;
+  font-variation-settings: "wght" 400, "wdth" 100;
+}
+
+/* ── edge blur (ReactBits GradualBlur) ──────────────────────── */
+
+.gradual-blur {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 600;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.gradual-blur--bottom {
+  bottom: 0;
+}
+
+.gradual-blur--top {
+  top: 0;
+}
+
+@media (max-width: 767px) {
+  .gradual-blur {
+    display: none;
+  }
+}
+
+/* ── incense (ReactBits SplashCursor) ───────────────────────── */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+.splash canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
 }

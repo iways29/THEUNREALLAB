@@ -1,127 +1,60 @@
-"use client";
+import Arrow from "@/components/Arrow";
+import SplitText from "@/components/reactbits/SplitText";
+import Magnet from "@/components/reactbits/Magnet";
+import GlareHover from "@/components/reactbits/GlareHover";
+import ScrambledText from "@/components/reactbits/ScrambledText";
+import { HERO_REVEAL_EVENT } from "@/lib/scenes";
 
+/**
+ * The film opens the page on its own; nothing here is visible until
+ * SceneEngine fires the reveal as the chariot settles on Krishna.
+ */
 export default function Hero() {
   return (
-    <section style={{
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative",
-      padding: "0 clamp(20px, 5vw, 48px)",
-      textAlign: "center",
-      overflow: "hidden",
-    }}>
-      <div className="hero-grid" />
-      <div className="hero-glow" />
-
-      {/* Eyebrow */}
-      <div className="animate-fade-up-1" style={{
-        fontFamily: "'DM Mono', monospace",
-        fontSize: 11, letterSpacing: "0.25em",
-        textTransform: "uppercase", color: "var(--accent)",
-        marginBottom: 32,
-        display: "flex", alignItems: "center", gap: 12,
-      }}>
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
-        Building the future
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
-      </div>
-
-      {/* Title */}
-      <h1 className="animate-fade-up-2" style={{
-        fontSize: "clamp(48px, 12vw, 130px)",
-        fontWeight: 800,
-        lineHeight: 0.92,
-        letterSpacing: "-0.03em",
-        marginBottom: 32,
-        overflowWrap: "anywhere",
-        minWidth: 0,
-        width: "100%",
-      }}>
-        We Make
-        <br />
-        <span style={{
-          display: "block",
-          color: "transparent",
-          WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-        }}>
-          The{" "}
-          <span style={{ color: "var(--accent)", WebkitTextStroke: "0px" }}>
-            Unreal
-          </span>
-        </span>
-        Real
-      </h1>
-
-      {/* Subtitle */}
-      <p className="animate-fade-up-3" style={{
-        maxWidth: 520, fontSize: "clamp(14px, 2vw, 17px)", lineHeight: 1.65,
-        color: "#888", fontWeight: 400, marginBottom: 52,
-      }}>
-        A product studio at the edge of AI and human experience.
-        We build tools that shouldn&apos;t exist yet.
-      </p>
-
-      {/* CTAs */}
-      <div className="animate-fade-up-4 hero-ctas" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
-        <a href="#products" style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          background: "var(--accent)", color: "var(--bg)",
-          fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700,
-          letterSpacing: "0.08em", textTransform: "uppercase",
-          padding: "16px 32px", borderRadius: 4, textDecoration: "none",
-          transition: "transform 0.25s, box-shadow 0.25s",
-          whiteSpace: "nowrap",
-        }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 20px 60px rgba(232,255,71,0.3)";
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
-          Explore our products
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
-        <a href="#about" style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          color: "#888", fontSize: 14, fontWeight: 500,
-          letterSpacing: "0.04em", textDecoration: "none",
-          transition: "color 0.2s", padding: "16px 0",
-          whiteSpace: "nowrap",
-        }}
-          onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
-          onMouseLeave={e => e.currentTarget.style.color = "#888"}
-        >
-          Our mission
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </a>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="animate-fade-in-delayed" style={{
-        position: "absolute", bottom: 40, left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", gap: 8,
-      }}>
-        <div className="scroll-line" />
-        <span style={{
-          fontFamily: "'DM Mono', monospace", fontSize: 9,
-          letterSpacing: "0.2em", textTransform: "uppercase",
-          color: "var(--muted)", writingMode: "vertical-rl",
-          transform: "rotate(180deg)",
-        }}>
-          Scroll
-        </span>
+    <section id="top" data-scene="0" className="section section--hero">
+      <div className="pin pin--bottom">
+        <div className="container container--hero">
+          <div className="hero__copy">
+            <div className="eyebrow" data-motion-hidden>
+              <span className="eyebrow__rule" />
+              <ScrambledText className="eyebrow__text" playOn={HERO_REVEAL_EVENT}>
+                The Unreal Lab · venture studio
+              </ScrambledText>
+            </div>
+            <h1 className="h1" data-motion-hidden>
+              <SplitText
+                as="span"
+                className="h1__text"
+                at="event"
+                event={HERO_REVEAL_EVENT}
+                stagger={110}
+              >
+                Every Arjuna needs a{" "}
+                <span className="hero__word--gold shiny-gold">Krishna.</span>
+              </SplitText>
+            </h1>
+            <p className="hero__sub" data-motion-hidden>
+              We build AI products of our own. We advise companies on AI that
+              has to actually work. And we ride beside founders who are too
+              early for everyone else. A charioteer first; a fund next, with
+              partners who want to be early.
+            </p>
+            <div className="hero__cta" data-motion-hidden>
+              <Magnet padding={48} magnetStrength={5}>
+                <GlareHover>
+                  <a href="#apply" className="button" data-cursor="Enter">
+                    Enter the field
+                    <Arrow />
+                  </a>
+                </GlareHover>
+              </Magnet>
+              <a href="#fund" className="hero__link" data-cursor="Early">
+                Be early with us
+                <Arrow />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

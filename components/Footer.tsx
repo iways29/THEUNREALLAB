@@ -1,55 +1,43 @@
-"use client";
-
 export default function Footer() {
+  const links: [string, string][] = [
+    ["https://mumba.ai", "Mumba.ai"],
+    ["https://github.com/iways29/ASHVAA", "ASHVAA"],
+    ["mailto:ishanpanchaal@theunreallab.com", "Email"],
+  ];
+
   return (
-    <footer className="footer-inner" style={{
-      borderTop: "1px solid var(--border)",
-      padding: "40px 48px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-    }}>
-      <a href="/" style={{
-        fontSize: 13, fontWeight: 700, letterSpacing: "0.1em",
-        textTransform: "uppercase", color: "var(--muted)", textDecoration: "none",
-        display: "flex", alignItems: "center", gap: 8,
-      }}>
-        <img
-          src="/the-unreal-lab-icon.svg"
-          alt=""
-          style={{ width: 22, height: 22 }}
-        />
-        The Unreal Lab
-      </a>
-
-      <div style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 11,
-        color: "#333", letterSpacing: "0.08em",
-      }}>
-        © {new Date().getFullYear()} The Unreal Lab. All rights reserved.
+    <footer className="footer">
+      <div className="footer-row">
+        <span className="vA" style={{ fontSize: "var(--text-sm)" }}>
+          The Unreal Lab
+        </span>
+        <ul className="footer-links">
+          {links.map(([href, label]) => (
+            <li key={label}>
+              <a
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                <span className="roll">
+                  <span data-text={label}>{label}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <span className="vA-label credit" style={{ color: "var(--ember)" }}>
+          Designed &amp; built by The Unreal Lab — obviously
+        </span>
       </div>
-
-      <div className="footer-links" style={{ display: "flex", gap: 28 }}>
-        {[
-          ["https://mumba.ai", "Mumba.ai"],
-          ["mailto:ishanpanchaal@theunreallab.com", "Contact"],
-          ["https://mumba.ai", "MUMBAAI"],
-        ].map(([href, label]) => (
-          <a
-            key={label}
-            href={href}
-            target={href.startsWith("http") ? "_blank" : undefined}
-            rel="noopener noreferrer"
-            style={{
-              fontSize: 12, color: "#444", textDecoration: "none",
-              letterSpacing: "0.05em", transition: "color 0.2s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
-            onMouseLeave={e => e.currentTarget.style.color = "#444"}
-          >
-            {label}
-          </a>
-        ))}
+      <div className="footer-fine">
+        <span className="vA-label">
+          Everything on this site is real. The products exist. That is the
+          point.
+        </span>
+        <span className="vA-label">
+          © {new Date().getFullYear()} The Unreal Lab
+        </span>
       </div>
     </footer>
   );

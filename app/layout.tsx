@@ -1,20 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, DM_Mono } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const syne = Syne({
+const instrument = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-syne",
-  display: "swap",
-});
-
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400"],
-  style: ["normal", "italic"],
-  variable: "--font-dm-mono",
+  weight: ["400", "500"],
+  variable: "--font-instrument",
   display: "swap",
 });
 
@@ -22,19 +14,21 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#100904",
 };
 
 export const metadata: Metadata = {
   title: "The Unreal Lab — We Make the Unreal Real",
-  description: "A product studio at the edge of AI and human experience. We build tools that shouldn't exist yet.",
-  keywords: ["AI", "product studio", "Mumba.ai", "conversational AI", "startup"],
+  description:
+    "A product studio for the age of AI. Two instruments shipped — Mumba.ai and ASHVAA — one growing in the dark.",
+  keywords: ["AI", "product studio", "Mumba.ai", "ASHVAA", "The Unreal Lab"],
   icons: {
-    icon: "/the-unreal-lab-icon.svg",
-    apple: "/the-unreal-lab-icon.svg",
+    icon: "/unreal-lab-mark.svg",
+    apple: "/unreal-lab-mark.svg",
   },
   openGraph: {
     title: "The Unreal Lab",
-    description: "A product studio at the edge of AI and human experience.",
+    description: "A product studio for the age of AI. We make the unreal real.",
     url: "https://theunreallab.com",
     siteName: "The Unreal Lab",
     type: "website",
@@ -52,10 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmMono.variable}`}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-      </head>
+    <html lang="en" className={instrument.variable}>
       <body>
         {children}
         <Analytics />

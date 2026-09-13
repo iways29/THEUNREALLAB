@@ -1,128 +1,73 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import HeroSpecimen from "./HeroSpecimen";
+
+const WORDS = ["We", "make", "the", "unreal", "real."];
+
 export default function Hero() {
+  const secRef = useRef<HTMLElement>(null);
+  const h1Ref = useRef<HTMLHeadingElement>(null);
+
+  /* headline words light with scroll, ORYZO-style */
+  useEffect(() => {
+    const sec = secRef.current;
+    const h1 = h1Ref.current;
+    if (!sec || !h1) return;
+    const spans = Array.from(h1.querySelectorAll<HTMLSpanElement>(".w"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      spans.forEach((s) => s.classList.add("lit"));
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rect = sec.getBoundingClientRect();
+      const range = rect.height - window.innerHeight;
+      const p = range > 0 ? Math.min(1, Math.max(0, -rect.top / range)) : 1;
+      spans.forEach((s, i) =>
+        s.classList.toggle("lit", p > 0.03 + i * 0.08)
+      );
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <section style={{
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative",
-      padding: "0 clamp(20px, 5vw, 48px)",
-      textAlign: "center",
-      overflow: "hidden",
-    }}>
-      <div className="hero-grid" />
-      <div className="hero-glow" />
-
-      {/* Eyebrow */}
-      <div className="animate-fade-up-1" style={{
-        fontFamily: "'DM Mono', monospace",
-        fontSize: 11, letterSpacing: "0.25em",
-        textTransform: "uppercase", color: "var(--accent)",
-        marginBottom: 32,
-        display: "flex", alignItems: "center", gap: 12,
-      }}>
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
-        Building the future
-        <span style={{ width: 40, height: 1, background: "var(--accent)", opacity: 0.5, display: "block", flexShrink: 0 }} />
+    <header ref={secRef} className="hero">
+      <div className="hero-sticky">
+        <HeroSpecimen sectionRef={secRef} />
+        <h1 ref={h1Ref} className="hero-h1 vA">
+          {WORDS.map((w, i) => (
+            <span key={i}>
+              <span className="w">{w}</span>
+              {i < WORDS.length - 1 ? " " : null}
+            </span>
+          ))}
+        </h1>
+        <div className="hero-foot">
+          <div className="hero-body">
+            <p className="vB" style={{ margin: 0 }}>
+              The Unreal Lab is a product studio for the age of AI. We build
+              instruments that shouldn&apos;t exist yet — and ship them while
+              everyone else is still demoing.
+            </p>
+            <span className="hero-note credit">
+              * Scroll to make it real.
+            </span>
+          </div>
+        </div>
       </div>
-
-      {/* Title */}
-      <h1 className="animate-fade-up-2" style={{
-        fontSize: "clamp(48px, 12vw, 130px)",
-        fontWeight: 800,
-        lineHeight: 0.92,
-        letterSpacing: "-0.03em",
-        marginBottom: 32,
-        overflowWrap: "anywhere",
-        minWidth: 0,
-        width: "100%",
-      }}>
-        We Make
-        <br />
-        <span style={{
-          display: "block",
-          color: "transparent",
-          WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-        }}>
-          The{" "}
-          <span style={{ color: "var(--accent)", WebkitTextStroke: "0px" }}>
-            Unreal
-          </span>
-        </span>
-        Real
-      </h1>
-
-      {/* Subtitle */}
-      <p className="animate-fade-up-3" style={{
-        maxWidth: 520, fontSize: "clamp(14px, 2vw, 17px)", lineHeight: 1.65,
-        color: "#888", fontWeight: 400, marginBottom: 52,
-      }}>
-        A product studio at the edge of AI and human experience.
-        We build tools that shouldn&apos;t exist yet.
-      </p>
-
-      {/* CTAs */}
-      <div className="animate-fade-up-4 hero-ctas" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
-        <a href="#products" style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          background: "var(--accent)", color: "var(--bg)",
-          fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700,
-          letterSpacing: "0.08em", textTransform: "uppercase",
-          padding: "16px 32px", borderRadius: 4, textDecoration: "none",
-          transition: "transform 0.25s, box-shadow 0.25s",
-          whiteSpace: "nowrap",
-        }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 20px 60px rgba(232,255,71,0.3)";
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
-          Explore our products
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
-        <a href="#about" style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          color: "#888", fontSize: 14, fontWeight: 500,
-          letterSpacing: "0.04em", textDecoration: "none",
-          transition: "color 0.2s", padding: "16px 0",
-          whiteSpace: "nowrap",
-        }}
-          onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
-          onMouseLeave={e => e.currentTarget.style.color = "#888"}
-        >
-          Our mission
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </a>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="animate-fade-in-delayed" style={{
-        position: "absolute", bottom: 40, left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", gap: 8,
-      }}>
-        <div className="scroll-line" />
-        <span style={{
-          fontFamily: "'DM Mono', monospace", fontSize: 9,
-          letterSpacing: "0.2em", textTransform: "uppercase",
-          color: "var(--muted)", writingMode: "vertical-rl",
-          transform: "rotate(180deg)",
-        }}>
-          Scroll
-        </span>
-      </div>
-    </section>
+    </header>
   );
 }

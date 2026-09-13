@@ -2,59 +2,63 @@
 
 import { useEffect, useRef } from "react";
 
+/** Gold dot tracks the pointer exactly; the ring lerps toward it. */
+const LERP = 0.14;
+
 export default function Cursor() {
-  const cursorRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const mx = useRef(0);
-  const my = useRef(0);
-  const rx = useRef(0);
-  const ry = useRef(0);
-  const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!finePointer || reduced) return;
+
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring) return;
+
+    document.documentElement.classList.add("has-cursor");
+    dot.hidden = false;
+    ring.hidden = false;
+
+    let mx = -100;
+    let my = -100;
+    let rx = -100;
+    let ry = -100;
+
     const onMove = (e: MouseEvent) => {
-      mx.current = e.clientX;
-      my.current = e.clientY;
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${mx.current - 4}px, ${my.current - 4}px)`;
-      }
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.transform = `translate(${mx - 3}px, ${my - 3}px)`;
+      const target = e.target as Element | null;
+      const over = Boolean(target?.closest?.("a, button"));
+      ring.classList.toggle("is-over", over);
     };
 
-    const animateRing = () => {
-      rx.current += (mx.current - rx.current - 16) * 0.12;
-      ry.current += (my.current - ry.current - 16) * 0.12;
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${rx.current}px, ${ry.current}px)`;
-      }
-      rafRef.current = requestAnimationFrame(animateRing);
+    let raf = 0;
+    const step = () => {
+      const size = ring.classList.contains("is-over") ? 64 : 34;
+      rx += (mx - rx - size / 2) * LERP;
+      ry += (my - ry - size / 2) * LERP;
+      ring.style.transform = `translate(${rx}px, ${ry}px)`;
+      raf = requestAnimationFrame(step);
     };
+    raf = requestAnimationFrame(step);
 
-    const onEnter = () => ringRef.current?.classList.add("hovered");
-    const onLeave = () => ringRef.current?.classList.remove("hovered");
-
-    document.addEventListener("mousemove", onMove);
-    rafRef.current = requestAnimationFrame(animateRing);
-
-    const links = document.querySelectorAll("a, button");
-    links.forEach((el) => {
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-    });
+    window.addEventListener("mousemove", onMove, { passive: true });
 
     return () => {
-      document.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(rafRef.current);
-      links.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnter);
-        el.removeEventListener("mouseleave", onLeave);
-      });
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(raf);
+      document.documentElement.classList.remove("has-cursor");
     };
   }, []);
 
   return (
     <>
-      <div ref={cursorRef} className="cursor" />
-      <div ref={ringRef} className="cursor-ring" />
+      <div ref={dotRef} className="cursor-dot" hidden aria-hidden="true" />
+      <div ref={ringRef} className="cursor-ring" hidden aria-hidden="true" />
     </>
   );
 }

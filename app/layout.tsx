@@ -1,12 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans } from "next/font/google";
+import {
+  Archivo,
+  Libre_Caslon_Display,
+  Tiro_Devanagari_Sanskrit,
+} from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const instrument = Instrument_Sans({
+const caslon = Libre_Caslon_Display({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-instrument",
+  weight: "400",
+  variable: "--font-caslon",
+  display: "swap",
+});
+
+const archivo = Archivo({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+const tiro = Tiro_Devanagari_Sanskrit({
+  subsets: ["devanagari", "latin"],
+  weight: "400",
+  variable: "--font-tiro",
   display: "swap",
 });
 
@@ -14,29 +32,42 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#100904",
+  themeColor: "#100c08",
 };
 
 export const metadata: Metadata = {
-  title: "The Unreal Lab — We Make the Unreal Real",
+  metadataBase: new URL("https://theunreallab.com"),
+  title: "The Unreal Lab — Every Arjuna needs a Krishna.",
   description:
-    "A product studio for the age of AI. Two instruments shipped — Mumba.ai and ASHVAA — one growing in the dark.",
-  keywords: ["AI", "product studio", "Mumba.ai", "ASHVAA", "The Unreal Lab"],
+    "A venture studio. We build AI products of our own, advise companies on AI that has to actually work, and ride beside founders who are too early for everyone else.",
+  keywords: [
+    "venture studio",
+    "AI",
+    "founders",
+    "enterprise AI",
+    "Mumba.ai",
+    "ASHVAA",
+    "The Unreal Lab",
+  ],
   icons: {
-    icon: "/unreal-lab-mark.svg",
-    apple: "/unreal-lab-mark.svg",
+    icon: "/mark.svg",
+    apple: "/mark.svg",
   },
   openGraph: {
-    title: "The Unreal Lab",
-    description: "A product studio for the age of AI. We make the unreal real.",
+    title: "The Unreal Lab — Every Arjuna needs a Krishna.",
+    description:
+      "A venture studio. We build, we advise, we partner, we back founders from nothing to the field. Not a fund yet. A charioteer first.",
     url: "https://theunreallab.com",
     siteName: "The Unreal Lab",
     type: "website",
+    images: [{ url: "/scenes/00-chariot.jpg", width: 1344, height: 752 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Unreal Lab",
-    description: "We Make the Unreal Real.",
+    title: "The Unreal Lab — Every Arjuna needs a Krishna.",
+    description:
+      "A venture studio for founders who are too early for everyone else.",
+    images: ["/scenes/00-chariot.jpg"],
   },
 };
 
@@ -46,7 +77,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={instrument.variable}>
+    <html
+      lang="en"
+      className={`${caslon.variable} ${archivo.variable} ${tiro.variable}`}
+    >
       <body>
         {children}
         <Analytics />

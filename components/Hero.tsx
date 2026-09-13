@@ -1,73 +1,57 @@
-"use client";
+import Arrow from "@/components/Arrow";
 
-import { useEffect, useRef } from "react";
-import HeroSpecimen from "./HeroSpecimen";
-
-const WORDS = ["We", "make", "the", "unreal", "real."];
+const WORDS = ["Every ", "Arjuna ", "needs ", "a "];
 
 export default function Hero() {
-  const secRef = useRef<HTMLElement>(null);
-  const h1Ref = useRef<HTMLHeadingElement>(null);
-
-  /* headline words light with scroll, ORYZO-style */
-  useEffect(() => {
-    const sec = secRef.current;
-    const h1 = h1Ref.current;
-    if (!sec || !h1) return;
-    const spans = Array.from(h1.querySelectorAll<HTMLSpanElement>(".w"));
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      spans.forEach((s) => s.classList.add("lit"));
-      return;
-    }
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const rect = sec.getBoundingClientRect();
-      const range = rect.height - window.innerHeight;
-      const p = range > 0 ? Math.min(1, Math.max(0, -rect.top / range)) : 1;
-      spans.forEach((s, i) =>
-        s.classList.toggle("lit", p > 0.03 + i * 0.08)
-      );
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   return (
-    <header ref={secRef} className="hero">
-      <div className="hero-sticky">
-        <HeroSpecimen sectionRef={secRef} />
-        <h1 ref={h1Ref} className="hero-h1 vA">
-          {WORDS.map((w, i) => (
-            <span key={i}>
-              <span className="w">{w}</span>
-              {i < WORDS.length - 1 ? " " : null}
+    <section id="top" data-scene="0" className="section section--bottom">
+      <div className="scrim scrim--up" />
+      <div className="container container--hero">
+        <div>
+          <div className="eyebrow" data-intro="eyebrow">
+            <span className="eyebrow__rule" />
+            <span className="eyebrow__text">The Unreal Lab · venture studio</span>
+          </div>
+          <h1 className="h1">
+            {WORDS.map((word) => (
+              <span key={word} className="hero__word" data-word>
+                {word}
+              </span>
+            ))}
+            <span className="hero__word hero__word--gold" data-word>
+              Krishna.
             </span>
-          ))}
-        </h1>
-        <div className="hero-foot">
-          <div className="hero-body">
-            <p className="vB" style={{ margin: 0 }}>
-              The Unreal Lab is a product studio for the age of AI. We build
-              instruments that shouldn&apos;t exist yet — and ship them while
-              everyone else is still demoing.
-            </p>
-            <span className="hero-note credit">
-              * Scroll to make it real.
-            </span>
+          </h1>
+          <p className="hero__sub" data-intro="sub">
+            We build AI products of our own. We advise companies on AI that has to
+            actually work. And we ride beside founders who are too early for
+            everyone else, from nothing to the field. Not a fund yet. A charioteer
+            first.
+          </p>
+          <div className="hero__cta" data-intro="cta">
+            <a href="#apply" className="button">
+              Enter the field
+              <Arrow />
+            </a>
+            <div className="scroll-hint">
+              <span className="scroll-hint__text">Scroll</span>
+              <span className="scroll-hint__line" />
+            </div>
           </div>
         </div>
+        <div className="verse-card" data-reveal>
+          <div className="verse-card__deva">
+            यत्र योगेश्वरः कृष्णो यत्र पार्थो धनुर्धरः ।
+            <br />
+            तत्र श्रीर्विजयो भूतिर्ध्रुवा नीतिर्मतिर्मम ॥
+          </div>
+          <div className="verse-card__gloss">
+            Where Krishna and Arjuna stand together, there follow fortune,
+            victory, prosperity and firm resolve.
+          </div>
+          <div className="verse-card__source">Bhagavad Gita · 18.78</div>
+        </div>
       </div>
-    </header>
+    </section>
   );
 }

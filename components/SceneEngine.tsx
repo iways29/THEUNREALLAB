@@ -3,21 +3,34 @@
 import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import useFrameScrub from "@/lib/useFrameScrub";
 import { BASE_TRAVEL, CHOREOGRAPHY, DRIFT } from "@/lib/choreography";
-import { FRAMES, SCENES, frameAt } from "@/lib/scenes";
+import {
+  FRAMES,
+  HERO_REVEAL_EVENT,
+  INTRO_HOLD,
+  INTRO_REVEAL,
+  SCENES,
+  frameAt,
+} from "@/lib/scenes";
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
+const easeInOut = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * t);
 
 /** Video fallback only: mix window between adjacent clips. */
 const HANDOFF = 0.1;
-/** Time constants (ms) for the eased stage and pointer. */
+/** Time constant (ms) for the eased stage. */
 const STAGE_LAG = 85;
-const POINTER_LAG = 160;
 /** Share of the viewport over which a block fades as it enters at the bottom
  *  and leaves at the top. The nav covers the top, so the exit starts under it. */
 const ENTER_BAND = 0.2;
 const EXIT_BAND = 0.16;
 const NAV_H = 72;
+
+/** The opening: a beat on the wide shot, then the dolly in to Krishna. */
+const INTRO_BEAT = 900;
+const INTRO_PUSH = 4200;
+/** How much faster the opening runs once the visitor has touched anything. */
+const INTRO_SKIP_RATE = 8;
 
 type Tracked = {
   el: HTMLElement;
@@ -26,11 +39,12 @@ type Tracked = {
   /** Progress offset from the element's stagger position in its section. */
   offset: number;
   scale: number;
-  sway: number;
-  tilt: boolean;
   track: [number, number] | null;
+  veil: boolean;
+  /** Eased hover state, 0–1, for the reading veil and its swell. */
+  hover: number;
   phase: number;
-  /** Hero only: ms before this element starts its entrance; -1 = no fade. */
+  /** Hero only: ms after the reveal before this element enters; -1 = no fade. */
   introDelay: number;
   /** Document-space top and height, measured with transforms cleared. */
   top: number;
@@ -40,15 +54,13 @@ type Tracked = {
   ps0: number;
 };
 
-/** Hero entrance delays, in ms, matching the handoff's intro timing. */
+/** Hero entrance delays, in ms after the reveal. */
 const INTRO: Record<string, number> = {
-  eyebrow: 200,
-  eyebrow__text: 200,
+  eyebrow: 0,
+  eyebrow__text: 0,
   h1: -1, // the words rise out of their masks instead (SplitText)
-  hero__sub: 900,
-  hero__cta: 1200,
-  "verse-card": 600,
-  seal: 1400,
+  hero__sub: 700,
+  hero__cta: 1000,
 };
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
@@ -69,7 +81,7 @@ export default function SceneEngine({
     () => window.matchMedia(REDUCED_QUERY).matches,
     () => false
   );
-  const { ready, render } = useFrameScrub(canvasRef, { enabled: !reduced });
+  const { ready, render, has } = useFrameScrub(canvasRef, { enabled: !reduced });
   // The rAF loop reads this without needing to be torn down when it flips.
   const readyRef = useRef(false);
 
@@ -108,6 +120,9 @@ export default function SceneEngine({
     );
     if (!sections.length) return;
 
+    const root = document.documentElement;
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+
     const sceneOf = (el: HTMLElement) => {
       const section = el.closest<HTMLElement>("[data-scene]");
       return section ? sections.indexOf(section) : 0;
@@ -134,9 +149,9 @@ export default function SceneEngine({
               depth: spec.depth,
               offset: (spec.stagger ?? 0) * i,
               scale: spec.scale ?? 0,
-              sway: spec.sway ?? 0,
-              tilt: Boolean(spec.tilt),
               track: spec.track ?? null,
+              veil: Boolean(spec.veil),
+              hover: 0,
               phase: tracked.length * 1.7,
               introDelay: scene === 0 && key ? INTRO[key] : 0,
               top: 0,
@@ -155,13 +170,11 @@ export default function SceneEngine({
 
     // ── geometry, measured once per layout ───────────────────────────────
     let vh = window.innerHeight;
-    let vw = window.innerWidth;
     const tops: number[] = [];
     const heights: number[] = [];
 
     const measure = () => {
       vh = window.innerHeight;
-      vw = window.innerWidth;
       const y = window.scrollY;
       // Read the layout with the choreography's transforms cleared; the next
       // frame writes them back.
@@ -190,21 +203,57 @@ export default function SceneEngine({
     window.addEventListener("resize", measure, { passive: true });
     window.addEventListener("orientationchange", measure, { passive: true });
 
-    // ── pointer, for the parallax ────────────────────────────────────────
-    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-    const finePointer = window.matchMedia("(pointer: fine)").matches;
-    const onPointer = (e: PointerEvent) => {
-      pointer.tx = (e.clientX / vw) * 2 - 1;
-      pointer.ty = (e.clientY / vh) * 2 - 1;
+    // ── the opening ──────────────────────────────────────────────────────
+    // The chariot plays itself in. The clock only advances onto frames that
+    // have decoded, so a slow connection stretches the shot rather than
+    // stuttering through it. Any input races it to the end; a scroll cuts
+    // straight there.
+    let introT = 0;
+    let introFrame = 1;
+    let introDone = reduced;
+    let skipping = false;
+    let heroT0 = -1;
+
+    const introFrameAt = (t: number) =>
+      t <= INTRO_BEAT
+        ? 1
+        : 1 +
+          Math.round(
+            (INTRO_HOLD - 1) * easeInOut(clamp01((t - INTRO_BEAT) / INTRO_PUSH))
+          );
+
+    const reveal = (now: number) => {
+      if (heroT0 >= 0) return;
+      heroT0 = now;
+      root.classList.add("hero-live");
+      window.dispatchEvent(new Event(HERO_REVEAL_EVENT));
     };
-    const onPointerLeave = () => {
-      pointer.tx = 0;
-      pointer.ty = 0;
+
+    const skip = () => {
+      skipping = true;
     };
-    if (finePointer && !reduced) {
-      window.addEventListener("pointermove", onPointer, { passive: true });
-      document.documentElement.addEventListener("pointerleave", onPointerLeave);
-    }
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.metaKey && !e.ctrlKey && !e.altKey) skip();
+    };
+    const listenForSkip = () => {
+      window.addEventListener("wheel", skip, { passive: true });
+      window.addEventListener("touchstart", skip, { passive: true });
+      window.addEventListener("pointerdown", skip, { passive: true });
+      window.addEventListener("keydown", onKey);
+    };
+    const stopListeningForSkip = () => {
+      window.removeEventListener("wheel", skip);
+      window.removeEventListener("touchstart", skip);
+      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("keydown", onKey);
+    };
+    const finishIntro = (now: number) => {
+      introDone = true;
+      introFrame = INTRO_HOLD;
+      reveal(now);
+      stopListeningForSkip();
+    };
+    if (!introDone) listenForSkip();
 
     // The clips exist as a safety net, not as the first thing a visitor
     // downloads. Posters carry the stage until the canvas is ready; only if it
@@ -238,6 +287,20 @@ export default function SceneEngine({
       const scene = Math.min(Math.floor(timeline), lastIndex);
       const p = timeline - scene;
 
+      if (!introDone) {
+        if (y > 8) {
+          finishIntro(now);
+        } else if (readyRef.current) {
+          // Advance as far as the decoded frames allow.
+          let next = introT + dt * (skipping ? INTRO_SKIP_RATE : 1);
+          while (next > introT && !has(introFrameAt(next))) next -= 16;
+          if (next > introT) introT = next;
+          introFrame = introFrameAt(introT);
+          if (introFrame >= INTRO_REVEAL) reveal(now);
+          if (introT >= INTRO_BEAT + INTRO_PUSH) finishIntro(now);
+        }
+      }
+
       // The stage eases toward the scroll position so a flick of the wheel
       // reads as a camera move, not a jump cut. The content follows scroll
       // exactly; the lag is short enough that the two never feel apart.
@@ -246,12 +309,9 @@ export default function SceneEngine({
       stageT += (timeline - stageT) * kStage;
       if (Math.abs(timeline - stageT) < 0.0004) stageT = timeline;
 
-      const kPointer = 1 - Math.exp(-dt / POINTER_LAG);
-      pointer.x += (pointer.tx - pointer.x) * kPointer;
-      pointer.y += (pointer.ty - pointer.y) * kPointer;
-
       if (readyRef.current && !reduced) {
-        render(stageT, pointer.x, pointer.y);
+        if (introDone) render(stageT);
+        else render(0, introFrame);
       } else {
         // Fallback: the six video layers, mixed on the same timeline.
         layers.forEach((layer, k) => {
@@ -278,6 +338,7 @@ export default function SceneEngine({
       }
 
       const elapsed = now - t0;
+      const sinceReveal = heroT0 < 0 ? -1 : now - heroT0;
 
       if (!reduced) {
         for (let i = 0; i < tracked.length; i++) {
@@ -301,27 +362,37 @@ export default function SceneEngine({
           let entry = smoothstep(clamp01((vh - vy - t.offset * vh * 0.6) / (vh * ENTER_BAND)));
           let enter = 0;
           if (t.scene === 0 && t.top < vh) {
-            // The hero is on screen at load, so it uses a timed entrance.
-            if (t.introDelay >= 0) {
-              entry = smoothstep(clamp01((elapsed - t.introDelay) / 1000));
-              if (t.introDelay) enter = (1 - entry) * 30;
+            // The hero waits for the opening, then uses a timed entrance.
+            if (sinceReveal < 0) {
+              entry = 0;
+            } else if (t.introDelay >= 0) {
+              entry = smoothstep(clamp01((sinceReveal - t.introDelay) / 1100));
+              enter = (1 - entry) * 28;
             } else {
               entry = 1;
             }
           }
           const alpha = exit * entry;
 
-          const s = t.scale ? 1 - t.scale * ps : 1;
-          const sx = t.sway * pointer.x;
-          const sy = t.tilt ? t.sway * 0.5 * pointer.y : 0;
+          // The reading veil: hover holds it fully, the middle of the
+          // viewport holds it lightly, and it eases off as attention moves.
+          if (t.veil && vb > 0 && vy < vh) {
+            const hovered = finePointer && t.el.matches(":hover") ? 1 : 0;
+            t.hover += (hovered - t.hover) * (1 - Math.exp(-dt / 160));
+            const center = vy + t.height / 2;
+            const band = smoothstep(1 - clamp01(Math.abs(center - vh * 0.5) / (vh * 0.34)));
+            t.el.style.setProperty(
+              "--focus",
+              Math.max(t.hover, band * 0.6).toFixed(3)
+            );
+          }
+
+          const s = (t.scale ? 1 - t.scale * ps : 1) * (1 + 0.016 * t.hover);
 
           t.el.style.opacity = alpha.toFixed(3);
           t.el.style.transform =
-            `translate3d(${sx.toFixed(2)}px, ${(lift + drift + enter + sy).toFixed(2)}px, 0)` +
-            (t.tilt
-              ? ` rotateX(${(-pointer.y * 4).toFixed(2)}deg) rotateY(${(pointer.x * 5).toFixed(2)}deg)`
-              : "") +
-            (t.scale ? ` scale(${s.toFixed(4)})` : "");
+            `translate3d(0, ${(lift + drift + enter).toFixed(2)}px, 0)` +
+            (s !== 1 ? ` scale(${s.toFixed(4)})` : "");
           if (t.track) {
             t.el.style.letterSpacing = `${(t.track[0] + (t.track[1] - t.track[0]) * entry).toFixed(3)}em`;
           }
@@ -331,12 +402,14 @@ export default function SceneEngine({
         for (let i = 0; i < inks.length; i++) {
           const ink = inks[i];
           const vy = ink.top - y;
-          const v =
-            ink.scene === 0 && ink.top < vh
-              ? smoothstep(clamp01((elapsed - 800) / 1800))
-              : smoothstep(clamp01((vh * 0.92 - vy) / (vh * 0.36)));
+          const v = smoothstep(clamp01((vh * 0.92 - vy) / (vh * 0.36)));
           ink.el.style.setProperty("--ink", v.toFixed(3));
         }
+
+        // The hero's scrim thickens with the copy and thins as it leaves.
+        const heroIn = sinceReveal < 0 ? 0 : smoothstep(clamp01(sinceReveal / 1400));
+        const heroOut = smoothstep(clamp01((timeline - 0.3) / 0.45));
+        root.style.setProperty("--veil-hero", (heroIn * (1 - heroOut)).toFixed(3));
       }
 
       if (bar) {
@@ -351,7 +424,7 @@ export default function SceneEngine({
           (Math.min(stageT, lastIndex) / lastIndex).toFixed(4)
         );
       }
-      const frame = frameAt(stageT);
+      const frame = introDone ? frameAt(stageT) : introFrame;
       if (frame !== lastFrame) {
         lastFrame = frame;
         if (counterFrame) counterFrame.textContent = String(frame).padStart(4, "0");
@@ -374,10 +447,7 @@ export default function SceneEngine({
       }
 
       // The nav veil thickens as soon as the page moves.
-      document.documentElement.style.setProperty(
-        "--nav-veil",
-        clamp01(y / 280).toFixed(3)
-      );
+      root.style.setProperty("--nav-veil", clamp01(y / 280).toFixed(3));
 
       raf = requestAnimationFrame(tick);
     };
@@ -390,17 +460,19 @@ export default function SceneEngine({
       window.clearTimeout(remeasure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("orientationchange", measure);
-      window.removeEventListener("pointermove", onPointer);
-      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
+      stopListeningForSkip();
+      root.classList.remove("hero-live");
+      root.style.removeProperty("--veil-hero");
       tracked.forEach((t) => {
         t.el.style.willChange = "";
         t.el.style.transform = "";
         t.el.style.opacity = "";
         t.el.style.letterSpacing = "";
+        t.el.style.removeProperty("--focus");
       });
       inks.forEach((ink) => ink.el.style.removeProperty("--ink"));
     };
-  }, [reduced, render]);
+  }, [reduced, render, has]);
 
   return null;
 }

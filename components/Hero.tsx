@@ -3,32 +3,43 @@ import SplitText from "@/components/reactbits/SplitText";
 import Magnet from "@/components/reactbits/Magnet";
 import GlareHover from "@/components/reactbits/GlareHover";
 import ScrambledText from "@/components/reactbits/ScrambledText";
-import VariableProximity from "@/components/reactbits/VariableProximity";
-import CircularText from "@/components/reactbits/CircularText";
-import ScrollVelocity from "@/components/reactbits/ScrollVelocity";
+import { HERO_REVEAL_EVENT } from "@/lib/scenes";
 
+/**
+ * The film opens the page on its own; nothing here is visible until
+ * SceneEngine fires the reveal as the chariot settles on Krishna.
+ */
 export default function Hero() {
   return (
     <section id="top" data-scene="0" className="section section--hero">
       <div className="pin pin--bottom">
         <div className="container container--hero">
           <div className="hero__copy">
-            <div className="eyebrow">
+            <div className="eyebrow" data-motion-hidden>
               <span className="eyebrow__rule" />
-              <ScrambledText className="eyebrow__text">
+              <ScrambledText className="eyebrow__text" playOn={HERO_REVEAL_EVENT}>
                 The Unreal Lab · venture studio
               </ScrambledText>
             </div>
-            <h1 className="h1">
-              <SplitText as="span" className="h1__text" at="mount" delay={300} stagger={90}>
+            <h1 className="h1" data-motion-hidden>
+              <SplitText
+                as="span"
+                className="h1__text"
+                at="event"
+                event={HERO_REVEAL_EVENT}
+                stagger={110}
+              >
                 Every Arjuna needs a{" "}
                 <span className="hero__word--gold shiny-gold">Krishna.</span>
               </SplitText>
             </h1>
-            <VariableProximity className="hero__sub">
-              We build AI products of our own. We advise companies on AI that has to actually work. And we ride beside founders who are too early for everyone else, from nothing to the field. Not a fund yet. A charioteer first.
-            </VariableProximity>
-            <div className="hero__cta">
+            <p className="hero__sub" data-motion-hidden>
+              We build AI products of our own. We advise companies on AI that
+              has to actually work. And we ride beside founders who are too
+              early for everyone else. A charioteer first; a fund next, with
+              partners who want to be early.
+            </p>
+            <div className="hero__cta" data-motion-hidden>
               <Magnet padding={48} magnetStrength={5}>
                 <GlareHover>
                   <a href="#apply" className="button" data-cursor="Enter">
@@ -37,34 +48,14 @@ export default function Hero() {
                   </a>
                 </GlareHover>
               </Magnet>
-              <div className="scroll-hint">
-                <span className="scroll-hint__text">Scroll</span>
-                <span className="scroll-hint__line" />
-              </div>
-            </div>
-          </div>
-          <div className="hero__aside">
-            <CircularText text="THE UNREAL LAB · VENTURE STUDIO · " spinDuration={44}>
-              <span className="diamond" />
-            </CircularText>
-            <div className="verse-card">
-              <div className="verse-card__deva">
-                यत्र योगेश्वरः कृष्णो यत्र पार्थो धनुर्धरः ।
-                <br />
-                तत्र श्रीर्विजयो भूतिर्ध्रुवा नीतिर्मतिर्मम ॥
-              </div>
-              <div className="verse-card__gloss">
-                Where Krishna and Arjuna stand together, there follow fortune,
-                victory, prosperity and firm resolve.
-              </div>
-              <div className="verse-card__source">Bhagavad Gita · 18.78</div>
+              <a href="#fund" className="hero__link" data-cursor="Early">
+                Be early with us
+                <Arrow />
+              </a>
             </div>
           </div>
         </div>
       </div>
-      <ScrollVelocity velocity={36}>
-        We build · We advise · We partner · We back ·&nbsp;
-      </ScrollVelocity>
     </section>
   );
 }

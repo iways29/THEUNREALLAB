@@ -1,6 +1,7 @@
 import SplitText from "@/components/reactbits/SplitText";
 import ScrambledText from "@/components/reactbits/ScrambledText";
 import ScrollReveal from "@/components/reactbits/ScrollReveal";
+import FlowingRows from "@/components/reactbits/FlowingRows";
 
 const ROWS = [
   { name: "Enterprise buyers", note: "Who decide if you are real" },
@@ -29,14 +30,7 @@ export default function TheRoom() {
             <ScrollReveal className="prose" style={{ marginBottom: 30 }}>
               Krishna’s strength at Kurukshetra was never the weapon. It was the alliances gathered long before the first arrow. Access is the advantage no term sheet lists, so we make it the first thing we give.
             </ScrollReveal>
-            <div className="rows">
-              {ROWS.map((row) => (
-                <div className="row" key={row.name}>
-                  <span className="row__name">{row.name}</span>
-                  <span className="row__note">{row.note}</span>
-                </div>
-              ))}
-            </div>
+            <FlowingRows rows={ROWS} />
           </div>
         </div>
       </div>

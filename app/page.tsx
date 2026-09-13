@@ -44,7 +44,7 @@ export default function Home() {
         SHADING={false}
       />
       <ClickSpark />
-      <TargetCursor />
+      <TargetCursor targetSelector="a, button, [data-cursor-target], .prose, .verse" />
     </>
   );
 }

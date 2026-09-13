@@ -83,19 +83,32 @@ export const SCENES: Scene[] = [
   },
 ];
 
+/**
+ * The chariot opens the site by itself. On load the stage plays frames
+ * 1 → INTRO_HOLD (the wide shot dollying in to Krishna), the hero copy is
+ * revealed as the playhead passes INTRO_REVEAL, and scrolling the hero
+ * section then carries the last frames of the scene to the cut.
+ */
+export const INTRO_HOLD = 168;
+export const INTRO_REVEAL = 158;
+/** Dispatched on `window` the moment the hero copy is allowed to appear. */
+export const HERO_REVEAL_EVENT = "hero:reveal";
+
 export const frameUrl = (n: number, small = false) =>
   `${small ? FRAMES.smallDir : FRAMES.dir}/${String(n).padStart(FRAMES.pad, "0")}.${FRAMES.ext}`;
 
 /**
  * Frame number (1-based) for a timeline position in [0, SCENES.length], where
  * the integer part is the scene and the fraction is progress through it.
+ * Scene 0 starts at INTRO_HOLD: the frames before it belong to the opening.
  */
 export function frameAt(timeline: number): number {
   const last = SCENES.length - 1;
   const clamped = Math.max(0, Math.min(timeline, last + 0.999999));
   const scene = Math.min(Math.floor(clamped), last);
   const p = clamped - scene;
-  const [start, end] = SCENES[scene].range;
+  const [first, end] = SCENES[scene].range;
+  const start = scene === 0 ? INTRO_HOLD : first;
   return start + Math.round(p * (end - start));
 }
 

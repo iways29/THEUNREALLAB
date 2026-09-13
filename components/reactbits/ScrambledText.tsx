@@ -2,10 +2,11 @@
 
 /**
  * Adapted from ReactBits <ScrambledText> (reactbits.dev/r/ScrambledText-TS-CSS).
- * Small caps that resolve out of noise: once as they scroll into view, and
- * again under the pointer. The original scrambles per character within a
- * radius on every pointer move; here the whole label resolves as one, which
- * suits an eleven-pixel line better than a hundred-pixel headline.
+ * Small caps that resolve out of noise: once as they scroll into view (or on
+ * a named window event, for the hero), and again under the pointer. The
+ * original scrambles per character within a radius on every pointer move;
+ * here the whole label resolves as one, which suits an eleven-pixel line
+ * better than a hundred-pixel headline.
  */
 
 import { useEffect, useRef, type ElementType } from "react";
@@ -22,6 +23,8 @@ interface ScrambledTextProps {
   scrambleChars?: string;
   /** Resolve again when the pointer enters. */
   rescrambleOnHover?: boolean;
+  /** Resolve on this window event instead of on scrolling into view. */
+  playOn?: string;
 }
 
 export default function ScrambledText({
@@ -31,6 +34,7 @@ export default function ScrambledText({
   duration = 1.1,
   scrambleChars = "·—|/\\:",
   rescrambleOnHover = true,
+  playOn,
 }: ScrambledTextProps) {
   const ref = useRef<HTMLElement>(null);
 
@@ -48,25 +52,38 @@ export default function ScrambledText({
         scrambleText: { text, chars: scrambleChars, speed: 0.55, revealDelay: 0.1 },
       });
     };
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          play();
-          io.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px" }
-    );
-    io.observe(el);
+
+    let io: IntersectionObserver | null = null;
+    const onEvent = () => {
+      window.removeEventListener(playOn!, onEvent);
+      play();
+    };
+    if (playOn) {
+      if (document.documentElement.classList.contains("hero-live")) play();
+      else window.addEventListener(playOn, onEvent);
+    } else {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            play();
+            io?.disconnect();
+          }
+        },
+        { rootMargin: "0px 0px -8% 0px" }
+      );
+      io.observe(el);
+    }
+
     const hover = () => play();
     if (rescrambleOnHover) el.addEventListener("pointerenter", hover);
     return () => {
-      io.disconnect();
+      io?.disconnect();
+      if (playOn) window.removeEventListener(playOn, onEvent);
       tween?.kill();
       el.textContent = text;
       el.removeEventListener("pointerenter", hover);
     };
-  }, [children, duration, scrambleChars, rescrambleOnHover]);
+  }, [children, duration, scrambleChars, rescrambleOnHover, playOn]);
 
   return (
     <Tag ref={ref} className={className}>

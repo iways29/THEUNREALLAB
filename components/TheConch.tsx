@@ -1,7 +1,8 @@
 import Arrow from "@/components/Arrow";
 import SplitText from "@/components/reactbits/SplitText";
 import ScrambledText from "@/components/reactbits/ScrambledText";
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
+import BentoCard from "@/components/reactbits/BentoCard";
+import BlurText from "@/components/reactbits/BlurText";
 import { EMAIL } from "@/lib/scenes";
 
 const FOUNDER_MAILTO = `mailto:${EMAIL}?subject=Founder%20application%20%E2%80%94%20The%20Unreal%20Lab`;
@@ -20,46 +21,34 @@ export default function TheConch() {
               Sound the conch. Tell us what you are building.
             </SplitText>
             <div className="grid grid--conch">
-              <SpotlightCard
-                as="a"
-                className="conch-card"
-                href={FOUNDER_MAILTO}
-                data-cursor="Write"
-                spotlightColor="rgba(230, 199, 106, 0.2)"
-              >
+              <BentoCard as="a" className="conch-card" href={FOUNDER_MAILTO} data-cursor="Write">
                 <div className="conch-card__label">Founders</div>
                 <div className="conch-card__title">
                   Apply for a seat in the chariot
                 </div>
-                <p className="conch-card__body">
+                <BlurText as="p" className="conch-card__body">
                   One email. No deck required. Tell us what you are making and what
                   is in your way. Every application is read; when the model fits we
                   answer within a week.
-                </p>
+                </BlurText>
                 <div className="conch-card__action">
                   Send the application
                   <Arrow />
                 </div>
-              </SpotlightCard>
-              <SpotlightCard
-                as="a"
-                className="conch-card"
-                href={PARTNER_MAILTO}
-                data-cursor="Write"
-                spotlightColor="rgba(230, 199, 106, 0.2)"
-              >
+              </BentoCard>
+              <BentoCard as="a" className="conch-card" href={PARTNER_MAILTO} data-cursor="Write">
                 <div className="conch-card__label">LPs, companies and partners</div>
                 <div className="conch-card__title">Be early with us</div>
-                <p className="conch-card__body">
+                <BlurText as="p" className="conch-card__body">
                   If you want to back founders before anyone else has met them, need
                   enterprise AI that actually works, or have a product that belongs
                   inside the enterprise, start a conversation.
-                </p>
+                </BlurText>
                 <div className="conch-card__action">
                   Start the conversation
                   <Arrow />
                 </div>
-              </SpotlightCard>
+              </BentoCard>
             </div>
           </div>
           <footer className="footer">

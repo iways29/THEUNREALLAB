@@ -2,7 +2,8 @@ import Verse from "@/components/Verse";
 import SplitText from "@/components/reactbits/SplitText";
 import ScrambledText from "@/components/reactbits/ScrambledText";
 import ScrollReveal from "@/components/reactbits/ScrollReveal";
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
+import BentoCard from "@/components/reactbits/BentoCard";
+import BlurText from "@/components/reactbits/BlurText";
 
 const STAGES = [
   { when: "Now", name: "Studio", note: "Build, advise, back with hours." },
@@ -28,11 +29,13 @@ export default function TheFund() {
             </ScrollReveal>
             <div className="grid grid--stages">
               {STAGES.map((stage) => (
-                <SpotlightCard className="card card--stage" key={stage.when}>
+                <BentoCard className="card card--stage" key={stage.when} tilt={3} motes={4}>
                   <div className="card__stage-label">{stage.when}</div>
                   <div className="card__stage-name">{stage.name}</div>
-                  <div className="card__stage-note">{stage.note}</div>
-                </SpotlightCard>
+                  <BlurText as="div" className="card__stage-note">
+                    {stage.note}
+                  </BlurText>
+                </BentoCard>
               ))}
             </div>
             <Verse

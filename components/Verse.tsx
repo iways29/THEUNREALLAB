@@ -1,3 +1,5 @@
+import BlurText from "@/components/reactbits/BlurText";
+
 /** The gold-ruled verse block used under The Promise, The Practice and The Fund. */
 export default function Verse({
   lines,
@@ -18,7 +20,9 @@ export default function Verse({
           </span>
         ))}
       </div>
-      <div className="verse__gloss">{gloss}</div>
+      <BlurText as="div" className="verse__gloss" delay={34}>
+        {gloss}
+      </BlurText>
       <div className="verse__source">{source}</div>
     </div>
   );

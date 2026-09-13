@@ -365,8 +365,11 @@ a:hover {
   justify-content: center;
 }
 
+/* The opening already spent the chariot's frames; the hero only needs enough
+   travel for its copy to leave before the cut. */
 .section--hero {
   justify-content: flex-start;
+  min-height: calc(100vh + 28vh);
 }
 
 .section--end {
@@ -388,6 +391,7 @@ a:hover {
 
 .pin--bottom {
   min-height: 100vh;
+  min-height: 100svh;
   align-items: flex-end;
 }
 
@@ -398,12 +402,19 @@ a:hover {
 }
 
 /* A faint bottom gradient is all that sits over the film, so the paintings
-   stay bright; panels and labels carry their own ink where they need it. */
+   stay bright; panels and labels carry their own ink where they need it.
+   SceneEngine raises --veil-hero while the hero copy is on screen, deepening
+   and lifting the gradient so the headline reads over the bright painting. */
 .veil {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(to top, rgba(16, 12, 8, 0.42) 0%, rgba(16, 12, 8, 0) 34%);
+  background: linear-gradient(
+    to top,
+    rgba(16, 12, 8, calc(0.42 + 0.32 * var(--veil-hero, 0))) 0%,
+    rgba(16, 12, 8, calc(0.22 * var(--veil-hero, 0))) calc(34% + 20% * var(--veil-hero, 0)),
+    rgba(16, 12, 8, 0) calc(34% + 34% * var(--veil-hero, 0))
+  );
 }
 
 .container {
@@ -422,13 +433,12 @@ a:hover {
 }
 
 .container--hero {
-  perspective: 1400px;
   padding-top: clamp(100px, 16vh, 140px);
-  padding-bottom: clamp(44px, 7vh, 88px);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-  gap: clamp(28px, 4vw, 64px);
-  align-items: end;
+  padding-bottom: clamp(40px, 7vh, 80px);
+}
+
+.hero__copy {
+  max-width: 900px;
 }
 
 .container--end {
@@ -484,11 +494,11 @@ a:hover {
   font-family: var(--serif);
   font-weight: 400;
   font-style: italic;
-  font-size: clamp(42px, 7.4vw, 124px);
+  font-size: clamp(42px, 6.6vw, 112px);
   line-height: 0.96;
   letter-spacing: -0.02em;
   margin: 0;
-  max-width: 12ch;
+  max-width: 17ch;
   text-wrap: pretty;
 }
 
@@ -543,9 +553,9 @@ a:hover {
 }
 
 .hero__sub {
-  margin: clamp(24px, 3.5vh, 40px) 0 0;
-  max-width: 50ch;
-  font-size: clamp(14px, 1.2vw, 17px);
+  margin: clamp(22px, 3.2vh, 36px) 0 0;
+  max-width: 46ch;
+  font-size: clamp(14px, 1.15vw, 17px);
   line-height: 1.7;
   color: var(--body);
 }
@@ -553,9 +563,29 @@ a:hover {
 .hero__cta {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: clamp(20px, 2.4vw, 36px);
   flex-wrap: wrap;
   margin-top: clamp(24px, 4vh, 44px);
+}
+
+/* The second door, for the ones who back rather than build. */
+.hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-decoration: none;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--rule-strong);
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.hero__link:hover {
+  color: var(--gold);
+  border-color: var(--gold);
 }
 
 .button {
@@ -597,15 +627,35 @@ a:hover {
   animation: pulseLine 2.6s ease-in-out infinite;
 }
 
-/* ── verse ──────────────────────────────────────────────────── */
+/* ── reading veil ───────────────────────────────────────────── */
 
-.hero__aside {
-  justify-self: end;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(20px, 3vh, 36px);
+/* A soft ink ellipse behind a block of copy. SceneEngine writes --focus as
+   the block is hovered or sits in the reading band of the viewport, so the
+   veil comes and goes with attention instead of sitting on the painting. */
+.prose,
+.verse,
+.h2 {
+  position: relative;
 }
+
+.prose::before,
+.verse::before,
+.h2::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -26px -44px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(16, 12, 8, 0.66) 0%,
+    rgba(16, 12, 8, 0.42) 44%,
+    rgba(16, 12, 8, 0) 72%
+  );
+  opacity: var(--focus, 0);
+}
+
+/* ── verse ──────────────────────────────────────────────────── */
 
 .verse-card {
   max-width: 420px;
@@ -706,14 +756,19 @@ a:hover {
   background: var(--rule);
 }
 
+/* The card itself is what the scroll choreography moves; its panel, the
+   .bento inside, is what the pointer moves (see BentoCard). */
 .card {
-  background: var(--panel);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+}
+
+.card .bento {
+  flex: 1;
   padding: clamp(24px, 2.6vw, 36px);
 }
 
-.card--stage {
+.card--stage .bento {
   padding: 22px 24px;
 }
 
@@ -776,12 +831,62 @@ a:hover {
 }
 
 .row {
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   padding: 18px 0;
   border-bottom: 1px solid var(--rule-row);
   transition: padding-left 0.45s var(--ease), border-color 0.45s ease;
+}
+
+/* The cream band that flows in under the pointer (ReactBits FlowingMenu). */
+.row__band {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+  color: var(--ink);
+  transform: translate3d(0, 101%, 0);
+}
+
+.row__track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: fit-content;
+  will-change: transform;
+}
+
+.row__part {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 18px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.row__part em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+  line-height: 1;
+}
+
+.row__part i {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(16, 12, 8, 0.62);
+}
+
+.row__part .diamond {
+  width: 8px;
+  height: 8px;
 }
 
 .row:hover {
@@ -814,19 +919,25 @@ a:hover {
 /* ── conch cards ────────────────────────────────────────────── */
 
 .conch-card {
-  display: block;
-  background: var(--panel-deep);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  padding: clamp(28px, 3vw, 44px);
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: var(--paper);
+}
+
+.conch-card .bento {
+  flex: 1;
+  padding: clamp(28px, 3vw, 44px);
+  background: var(--panel-deep);
   transition: background 0.4s ease;
 }
 
 .conch-card:hover {
-  background: rgba(244, 239, 228, 0.1);
   color: var(--paper);
+}
+
+.conch-card:hover .bento {
+  background: rgba(244, 239, 228, 0.1);
 }
 
 .conch-card__label {
@@ -921,11 +1032,25 @@ a:hover {
 /* ── motion ─────────────────────────────────────────────────── */
 
 /* Opacity and transform for every choreographed element are written each
-   frame by SceneEngine from lib/choreography.ts. Nothing starts hidden in
-   CSS, so the page is still readable if the script never runs. */
+   frame by SceneEngine from lib/choreography.ts. Only the hero starts hidden:
+   it waits for the film, and a flash of copy before the engine's first frame
+   would spoil the opening. Reduced motion shows it outright. */
 
 [data-motion-hidden] {
   opacity: 0;
+}
+
+.nav {
+  animation: navIn 1.6s var(--ease) both;
+}
+
+@keyframes navIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── reduced motion: static posters, no parallax or drift ───── */
@@ -938,6 +1063,15 @@ a:hover {
   /* No scrub, so no scroll travel to pay for: one viewport per scene. */
   :root {
     --scene-travel: 0px;
+    --veil-hero: 1;
+  }
+
+  [data-motion-hidden] {
+    opacity: 1;
+  }
+
+  .nav {
+    animation: none;
   }
 
   .scroll-hint__line {
@@ -1026,39 +1160,98 @@ a:hover {
   }
 }
 
-/* ── spotlight (ReactBits SpotlightCard) ────────────────────── */
+/* ── bento panels (ReactBits MagicBento) ────────────────────── */
 
-.card-spotlight {
+.bento {
   position: relative;
   overflow: hidden;
-  --mouse-x: 50%;
-  --mouse-y: 50%;
-  --spotlight-color: rgba(230, 199, 106, 0.16);
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  will-change: transform;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow: 0;
 }
 
-.card-spotlight::before {
+.bento > :not(.bento__layer) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Interior light under the pointer. */
+.bento::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
+  pointer-events: none;
   background: radial-gradient(
-    380px circle at var(--mouse-x) var(--mouse-y),
-    var(--spotlight-color),
+    360px circle at var(--glow-x) var(--glow-y),
+    rgba(230, 199, 106, 0.24),
     transparent 70%
   );
-  opacity: 0;
+  opacity: var(--glow);
   transition: opacity 0.5s ease;
+}
+
+/* Border glow: a gold radial masked down to a one-pixel frame. */
+.bento::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    340px circle at var(--glow-x) var(--glow-y),
+    rgba(230, 199, 106, 1) 0%,
+    rgba(230, 199, 106, 0.45) 40%,
+    transparent 70%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: var(--glow);
+  transition: opacity 0.4s ease;
+}
+
+.bento__layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   pointer-events: none;
 }
 
-.card-spotlight:hover::before,
-.card-spotlight:focus-within::before {
-  opacity: 1;
+.bento__mote {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 6px rgba(230, 199, 106, 0.6);
 }
 
-.card-spotlight > * {
-  position: relative;
-  z-index: 1;
+.bento__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(230, 199, 106, 0.32) 0%,
+    rgba(230, 199, 106, 0.14) 30%,
+    transparent 70%
+  );
+}
+
+/* ── blur-in copy (ReactBits BlurText) ──────────────────────── */
+
+.blur-word {
+  display: inline-block;
 }
 
 /* ── glare (ReactBits GlareHover) ───────────────────────────── */
@@ -1322,16 +1515,8 @@ html.has-cursor button {
 }
 
 @media (max-width: 767px) {
-  .frame-counter,
-  .seal {
+  .frame-counter {
     display: none;
-  }
-
-  /* The hero stack is taller than a phone viewport: flow it under the nav
-     instead of anchoring it to the bottom and pushing the eyebrow off. */
-  .pin--bottom {
-    min-height: 0;
-    align-items: flex-start;
   }
 
   .container--hero {

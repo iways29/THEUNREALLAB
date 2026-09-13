@@ -4,9 +4,10 @@
  * Adapted from ReactBits <Particles> (reactbits.dev/r/Particles-TS-CSS).
  *
  * Gold dust hanging in the air between the painting and the type. WebGL
- * points via OGL; each mote drifts on its own sine, the whole field leans
- * away from the pointer and slides with scroll, so it reads as a layer at a
- * different depth from both the stage and the copy.
+ * points via OGL; each mote drifts on its own sine and the whole field
+ * slides with scroll, so it reads as a layer at a different depth from both
+ * the stage and the copy. It does not follow the pointer: nothing on the
+ * page does.
  */
 
 import { useEffect, useRef } from "react";
@@ -17,7 +18,6 @@ interface ParticlesProps {
   particleSpread?: number;
   speed?: number;
   particleColors?: string[];
-  particleHoverFactor?: number;
   particleBaseSize?: number;
   sizeRandomness?: number;
   cameraDistance?: number;
@@ -80,7 +80,6 @@ export default function Particles({
   particleSpread = 10,
   speed = 0.08,
   particleColors = ["#e6c76a", "#f4efe4", "#d9a441", "#e6c76a"],
-  particleHoverFactor = 0.5,
   particleBaseSize = 70,
   sizeRandomness = 1.2,
   cameraDistance = 20,
@@ -116,13 +115,6 @@ export default function Particles({
     };
     window.addEventListener("resize", resize, { passive: true });
     resize();
-
-    const mouse = { x: 0, y: 0 };
-    const onMove = (e: MouseEvent) => {
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -((e.clientY / window.innerHeight) * 2 - 1);
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
 
     const positions = new Float32Array(count * 3);
     const randoms = new Float32Array(count * 4);
@@ -163,7 +155,6 @@ export default function Particles({
     let raf = 0;
     let last = performance.now();
     let elapsed = 0;
-    const px = { x: 0, y: 0 };
 
     const update = (t: number) => {
       raf = requestAnimationFrame(update);
@@ -172,13 +163,10 @@ export default function Particles({
       elapsed += delta * speed;
       program.uniforms.uTime.value = elapsed * 0.001;
 
-      px.x += (mouse.x - px.x) * 0.04;
-      px.y += (mouse.y - px.y) * 0.04;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const sp = max > 0 ? window.scrollY / max : 0;
 
-      particles.position.x = -px.x * particleHoverFactor;
-      particles.position.y = -px.y * particleHoverFactor + (sp - 0.5) * scrollTravel;
+      particles.position.y = (sp - 0.5) * scrollTravel;
       particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
       particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
       particles.rotation.z += 0.004 * speed;
@@ -190,7 +178,6 @@ export default function Particles({
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
     };
   }, [
@@ -198,7 +185,6 @@ export default function Particles({
     particleSpread,
     speed,
     particleColors,
-    particleHoverFactor,
     particleBaseSize,
     sizeRandomness,
     cameraDistance,

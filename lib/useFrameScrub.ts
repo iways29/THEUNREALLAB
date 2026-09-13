@@ -39,6 +39,7 @@ export type FrameScrubOptions = {
  * Until then this is inert: it reports that no scene has a frame sequence yet,
  * which is the signal SceneEngine uses to stay on the video stage.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- options land with the Phase 2 implementation
 export function useFrameScrub(_options: FrameScrubOptions = {}): { ready: boolean } {
   // TODO(phase-2): build the canvas, preloader and rAF draw loop here.
   const ready = SCENES.every((scene) => scene.frames !== null);

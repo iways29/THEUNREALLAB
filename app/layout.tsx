@@ -17,6 +17,7 @@ const caslon = Libre_Caslon_Display({
 const archivo = Archivo({
   subsets: ["latin"],
   style: ["normal", "italic"],
+  axes: ["wdth"],
   variable: "--font-archivo",
   display: "swap",
 });

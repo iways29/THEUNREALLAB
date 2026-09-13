@@ -1,43 +1,48 @@
 # Scene assets
 
-Six scenes, one per section, in scroll order. Generated in Higgsfield and
-self-hosted here (see `design_handoff/README.md` for the original URLs).
+Six scenes, one per section, in scroll order. Posters and entry clips are
+generated in Higgsfield and self-hosted here; they are the **fallback** stage,
+used only until the frame scrub is ready (or under `prefers-reduced-motion`).
 
-| # | slug | section | poster | entry clip | exit clip |
-|---|------|---------|--------|-----------|-----------|
-| 0 | chariot  | `#top`      | `00-chariot.jpg`  | `00-chariot.mp4`  | `00-chariot-exit.mp4`  |
-| 1 | counsel  | `#promise`  | `01-counsel.jpg`  | `01-counsel.mp4`  | `01-counsel-exit.mp4`  |
-| 2 | bow      | `#practice` | `02-bow.jpg`      | `02-bow.mp4`      | `02-bow-exit.mp4`      |
-| 3 | assembly | `#room`     | `03-assembly.jpg` | `03-assembly.mp4` | `03-assembly-exit.mp4` |
-| 4 | raigad   | `#fund`     | `04-raigad.jpg`   | `04-raigad.mp4`   | `04-raigad-exit.mp4`   |
-| 5 | conch    | `#apply`    | `05-conch.jpg`    | `05-conch.mp4`    | `05-conch-exit.mp4`    |
+| # | slug | section | poster | clip | frames |
+|---|------|---------|--------|------|--------|
+| 0 | chariot  | `#top`      | `00-chariot.jpg`  | `00-chariot.mp4`  | 1–170    |
+| 1 | counsel  | `#promise`  | `01-counsel.jpg`  | `01-counsel.mp4`  | 171–339  |
+| 2 | bow      | `#practice` | `02-bow.jpg`      | `02-bow.mp4`      | 340–509  |
+| 3 | assembly | `#room`     | `03-assembly.jpg` | `03-assembly.mp4` | 510–679  |
+| 4 | raigad   | `#fund`     | `04-raigad.jpg`   | `04-raigad.mp4`   | 680–848  |
+| 5 | conch    | `#apply`    | `05-conch.jpg`    | `05-conch.mp4`    | 849–1017 |
 
-Posters are the original PNGs re-encoded to JPEG q82 (1344x752, ~400KB each
-instead of ~1.9MB). Phase 1 uses poster + entry clip only.
+The `-exit.mp4` clips are superseded by the merged film and no longer
+referenced; they can be deleted.
 
-## Exit clips
+## The frame scrub
 
-Each `-exit.mp4` was produced with Seedance 2.5 in `video_extension / forward`
-mode from the entry clip itself, not from a still — so the camera move, light
-and cloud drift continue across the join and the scene ends on a frame that
-leads into the next one. They are registered in `lib/scenes.ts` as
-`Scene.exitClip` and are not played in Phase 1.
+The stage is **one 1017-frame sequence** extracted at 13 fps from the merged
+78 s film (`~/Downloads/TheUnREAL.mp4`, 1280×720). Frame ranges per scene are
+declared in `lib/scenes.ts`; every boundary above is a hard cut in the
+footage, which `lib/useFrameScrub.ts` dissolves over the last 9% of the
+outgoing scene.
 
-## Exporting frames for Phase 2
+Frames live in `public/frames/0001.webp … 1017.webp` (1280×720, WebP q82,
+unsharp-masked) with a mobile set in `public/frames-sm/` (640×360). They are
+**git-ignored** — ~90 MB is more than this connection can push — so they need
+a CDN or Git LFS before deploy. Without them the site falls back to the
+posters and clips above.
 
-The frame-scrub engine wants one continuous sequence per scene: the entry
-clip's frames first, the exit clip's continuing the same count.
+To regenerate from the exported JPGs:
 
-```bash
-# entry clip -> 0001...
-ffmpeg -i 00-chariot.mp4 -vf fps=15,scale=1920:1080 -q:v 4 \
-  frames/00-chariot/%04d.jpg
-
-# exit clip -> continues the numbering (adjust -start_number to entry count + 1)
-ffmpeg -i 00-chariot-exit.mp4 -vf fps=15,scale=1920:1080 -q:v 4 \
-  -start_number 121 frames/00-chariot/%04d.jpg
+```python
+# python3, Pillow
+from PIL import Image, ImageFilter
+im = Image.open("frame_001.jpg").convert("RGB")
+im.filter(ImageFilter.UnsharpMask(radius=1.1, percent=65, threshold=2)) \
+  .save("public/frames/0001.webp", "WEBP", quality=82, method=4)
+im.resize((640, 360), Image.LANCZOS) \
+  .filter(ImageFilter.UnsharpMask(radius=0.8, percent=40, threshold=2)) \
+  .save("public/frames-sm/0001.webp", "WEBP", quality=78, method=4)
 ```
 
-Then set `Scene.frames = { dir: "/frames/00-chariot", count: <total> }` in
-`lib/scenes.ts` and implement `lib/useFrameScrub.ts`, which carries the full
-Phase 2 checklist.
+The frames are native 720p and get upscaled ~2.5× on a Retina display; the
+only real fix for softness is a higher-resolution source (an ML upscale of
+the merged film to 4K, then re-extract).

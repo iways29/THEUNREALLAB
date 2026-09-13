@@ -1,4 +1,7 @@
 import Arrow from "@/components/Arrow";
+import SplitText from "@/components/reactbits/SplitText";
+import ScrambledText from "@/components/reactbits/ScrambledText";
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { EMAIL } from "@/lib/scenes";
 
 const FOUNDER_MAILTO = `mailto:${EMAIL}?subject=Founder%20application%20%E2%80%94%20The%20Unreal%20Lab`;
@@ -8,17 +11,22 @@ export default function TheConch() {
   const year = new Date().getFullYear();
 
   return (
-    <section id="apply" data-scene="5" className="section">
+    <section id="apply" data-scene="5" className="section section--end">
       <div className="pin pin--column">
-        <div className="scrim scrim--conch" />
         <div className="container container--conch">
           <div>
-            <div className="label">V · The conch</div>
-            <h2 className="h2 h2--conch">
+            <ScrambledText as="div" className="label">V · The conch</ScrambledText>
+            <SplitText as="h2" className="h2 h2--conch" at="scroll">
               Sound the conch. Tell us what you are building.
-            </h2>
+            </SplitText>
             <div className="grid grid--conch">
-              <a className="conch-card" href={FOUNDER_MAILTO}>
+              <SpotlightCard
+                as="a"
+                className="conch-card"
+                href={FOUNDER_MAILTO}
+                data-cursor="Write"
+                spotlightColor="rgba(230, 199, 106, 0.2)"
+              >
                 <div className="conch-card__label">Founders</div>
                 <div className="conch-card__title">
                   Apply for a seat in the chariot
@@ -32,8 +40,14 @@ export default function TheConch() {
                   Send the application
                   <Arrow />
                 </div>
-              </a>
-              <a className="conch-card" href={PARTNER_MAILTO}>
+              </SpotlightCard>
+              <SpotlightCard
+                as="a"
+                className="conch-card"
+                href={PARTNER_MAILTO}
+                data-cursor="Write"
+                spotlightColor="rgba(230, 199, 106, 0.2)"
+              >
                 <div className="conch-card__label">LPs, companies and partners</div>
                 <div className="conch-card__title">Be early with us</div>
                 <p className="conch-card__body">
@@ -45,7 +59,7 @@ export default function TheConch() {
                   Start the conversation
                   <Arrow />
                 </div>
-              </a>
+              </SpotlightCard>
             </div>
           </div>
           <footer className="footer">

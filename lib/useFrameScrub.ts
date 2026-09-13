@@ -1,25 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { SCENES } from "@/lib/scenes";
+import { FRAMES, SCENES, frameAt, frameUrl } from "@/lib/scenes";
 
 export type FrameScrubOptions = {
   /** Disable entirely (reduced motion) and leave the video stage in charge. */
   enabled?: boolean;
-  /** Fraction of a scene's travel spent cross-dissolving into the next. */
+  /** Fraction of a scene's travel spent dissolving across the cut into the next. */
   handoff?: number;
-  /** Scale travel per scene, alternating zoom-in / zoom-out. */
-  zoom?: number;
+  /** Overscan so the stage can drift under the pointer without showing edges. */
+  parallax?: number;
 };
 
 export type ScrubApi = {
   /** True once every scene has its first frame decoded and the canvas can take over. */
   ready: boolean;
   /**
-   * Draw the stage at `timeline`, a position in [0, SCENES.length] where the
-   * integer part is the scene and the fraction is progress through it.
+   * Draw the stage at `timeline` (see `frameAt`). `px`/`py` are the pointer in
+   * [-1, 1] and pan the frame a little for depth.
    */
-  render: (timeline: number) => void;
+  render: (timeline: number, px?: number, py?: number) => void;
 };
 
 /** Concurrent image requests. Keeps the network busy without starving the page. */
@@ -27,110 +27,72 @@ const CONCURRENCY = 6;
 /** Scenes loaded ahead of the current one. */
 const LOOKAHEAD = 2;
 
-type Sequence = {
-  urls: string[];
-  images: (HTMLImageElement | null)[];
-  /** Indices already decoded, kept sorted for nearest-frame fallback. */
-  done: number[];
-};
-
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
-/** Nearest already-decoded frame, so scrubbing degrades instead of blanking. */
-function nearestLoaded(seq: Sequence, want: number): HTMLImageElement | null {
-  if (seq.images[want]) return seq.images[want];
-  const { done } = seq;
-  if (done.length === 0) return null;
-  let best = done[0];
-  let bestD = Math.abs(best - want);
-  for (let i = 1; i < done.length; i++) {
-    const d = Math.abs(done[i] - want);
-    if (d < bestD) {
-      bestD = d;
-      best = done[i];
-    }
-  }
-  return seq.images[best];
-}
-
 /**
- * Phase 2 — scroll-scrubbed frame sequences.
+ * Phase 2 — the scroll-scrubbed stage.
  *
- * One full-screen canvas replaces the six <video> layers. Section progress maps
- * straight onto a frame index, so the camera moves exactly as far as the user
- * scrolls, forward and backward, with a cross-dissolve at each handoff.
- *
- * TODO(phase-2): the exit clips in `Scene.exitClip` are generated and committed
- * but not yet extracted to frames. When they are, append their frames to the
- * same sequence and raise `Scene.frames.count` — nothing here needs to change,
- * since a scene is treated as one flat timeline.
+ * One full-screen canvas draws a frame of the merged film indexed by scroll
+ * position, forward and backward. Frames load coarse-to-fine around the
+ * current scene, and the nearest already-decoded frame is drawn while the
+ * exact one is still in flight, so fast scrubbing degrades instead of blanking.
  */
 export function useFrameScrub(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   options: FrameScrubOptions = {}
 ): ScrubApi {
-  const { enabled = true, handoff = 0.1, zoom = 0.22 } = options;
-  const renderRef = useRef<(timeline: number) => void>(() => {});
+  const { enabled = true, handoff = 0.09, parallax = 0.022 } = options;
+  const renderRef = useRef<(t: number, px?: number, py?: number) => void>(
+    () => {}
+  );
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!enabled || !canvas) return;
 
-    const frames = SCENES.map((s) => s.frames);
-    if (frames.some((f) => f === null)) return; // no sequences yet
-
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
     // Small screens get the half-size set; it is a quarter of the bytes.
     const small = window.innerWidth < 768;
-    const sequences: Sequence[] = frames.map((f) => {
-      const dir = small ? f!.dir.replace("/frames/", "/frames-sm/") : f!.dir;
-      return {
-        urls: Array.from(
-          { length: f!.count },
-          (_, i) => `${dir}/${String(i + 1).padStart(4, "0")}.jpg`
-        ),
-        images: new Array(f!.count).fill(null),
-        done: [],
-      };
-    });
+    const count = FRAMES.count;
+    const images: (HTMLImageElement | null)[] = new Array(count).fill(null);
 
     let cancelled = false;
     let needsDraw = true;
     let lastTimeline = -1;
+    let lastPx = 0;
+    let lastPy = 0;
 
     // ── loading ──────────────────────────────────────────────────────────
-    const queue: { scene: number; index: number }[] = [];
-    const queued = new Set<string>();
+    const queue: number[] = [];
+    const queued = new Uint8Array(count);
     let active = 0;
 
-    const enqueue = (scene: number, index: number, front = false) => {
-      const key = `${scene}:${index}`;
-      if (queued.has(key) || sequences[scene].images[index]) return;
-      queued.add(key);
-      const job = { scene, index };
-      if (front) queue.unshift(job);
-      else queue.push(job);
+    const enqueue = (index: number, front = false) => {
+      if (index < 0 || index >= count || queued[index] || images[index]) return;
+      queued[index] = 1;
+      if (front) queue.unshift(index);
+      else queue.push(index);
     };
 
     const pump = () => {
       while (!cancelled && active < CONCURRENCY && queue.length) {
-        const job = queue.shift()!;
-        const seq = sequences[job.scene];
+        const index = queue.shift()!;
         active++;
         const img = new Image();
         img.decoding = "async";
-        img.src = seq.urls[job.index];
+        img.src = frameUrl(index + 1, small);
         const settle = (ok: boolean) => {
           active--;
           if (cancelled) return;
           if (ok) {
-            seq.images[job.index] = img;
-            seq.done.push(job.index);
+            images[index] = img;
             needsDraw = true;
+          } else {
+            queued[index] = 0;
           }
           pump();
         };
@@ -146,30 +108,50 @@ export function useFrameScrub(
     };
 
     /** First frame of every scene, so the stage is never empty. */
-    sequences.forEach((_, k) => enqueue(k, 0));
+    SCENES.forEach((s) => enqueue(s.range[0] - 1));
     pump();
 
     let lastPriority = -1;
     const prioritise = (scene: number) => {
       if (scene === lastPriority) return;
       lastPriority = scene;
+      // Drop what is waiting; in-flight requests still land.
+      for (const i of queue) queued[i] = 0;
       queue.length = 0;
-      queued.clear();
-      for (let k = scene; k <= Math.min(scene + LOOKAHEAD, sequences.length - 1); k++) {
-        const seq = sequences[k];
-        // Interleave so a coarse pass lands before the in-between frames.
-        for (let step = 8; step >= 1; step = Math.floor(step / 2)) {
-          for (let i = 0; i < seq.urls.length; i += step) enqueue(k, i);
-          if (step === 1) break;
+      const last = SCENES.length - 1;
+      const window_ = [];
+      for (let k = scene; k <= Math.min(scene + LOOKAHEAD, last); k++) window_.push(k);
+      if (scene > 0) window_.push(scene - 1);
+      // Coarse pass over the whole window first, then refine.
+      for (let step = 16; step >= 1; step = step >> 1) {
+        for (const k of window_) {
+          const [start, end] = SCENES[k].range;
+          for (let i = start - 1; i <= end - 1; i += step) enqueue(i);
+          enqueue(end - 1);
         }
       }
       pump();
+    };
+
+    /** Nearest already-decoded frame, searching outward from the one wanted. */
+    const nearestLoaded = (want: number): HTMLImageElement | null => {
+      if (images[want]) return images[want];
+      for (let d = 1; d < count; d++) {
+        const a = want - d;
+        const b = want + d;
+        if (a >= 0 && images[a]) return images[a];
+        if (b < count && images[b]) return images[b];
+        if (a < 0 && b >= count) break;
+      }
+      return null;
     };
 
     // ── canvas sizing ────────────────────────────────────────────────────
     let cw = 0;
     let ch = 0;
     const resize = () => {
+      // Full device pixels up to 2x: the frames are upscaled once, straight
+      // to the screen, instead of twice through a smaller backing store.
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       cw = window.innerWidth;
       ch = window.innerHeight;
@@ -178,13 +160,20 @@ export function useFrameScrub(
       canvas.style.width = `${cw}px`;
       canvas.style.height = `${ch}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
       needsDraw = true;
     };
     resize();
     window.addEventListener("resize", resize, { passive: true });
 
     // ── drawing ──────────────────────────────────────────────────────────
-    const drawCover = (img: HTMLImageElement, scale: number, alpha: number) => {
+    const drawCover = (
+      img: HTMLImageElement,
+      alpha: number,
+      px: number,
+      py: number
+    ) => {
       const ir = img.naturalWidth / img.naturalHeight;
       const cr = cw / ch;
       let dw: number;
@@ -196,52 +185,65 @@ export function useFrameScrub(
         dw = cw;
         dh = cw / ir;
       }
+      const scale = 1 + parallax;
       dw *= scale;
       dh *= scale;
+      // The pointer pans the overscan; the frame moves against the pointer,
+      // like looking past a window frame.
+      const ox = -px * (dw - cw) * 0.5 * 0.9;
+      const oy = -py * (dh - ch) * 0.5 * 0.9;
       ctx.globalAlpha = alpha;
-      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+      ctx.drawImage(img, (cw - dw) / 2 + ox, (ch - dh) / 2 + oy, dw, dh);
       ctx.globalAlpha = 1;
     };
 
-    const frameFor = (seq: Sequence, p: number) =>
-      Math.round(clamp01(p) * (seq.urls.length - 1));
-
-    // Alternating zoom-in / zoom-out, matching the Phase 1 layer scale.
-    const scaleFor = (scene: number, p: number) =>
-      1 + zoom * (scene % 2 === 0 ? p : 1 - p);
-
-    const paint = (timeline: number) => {
-      const last = sequences.length - 1;
+    const paint = (timeline: number, px: number, py: number) => {
+      const last = SCENES.length - 1;
       const clamped = Math.max(0, Math.min(timeline, last + 0.999999));
       const scene = Math.min(Math.floor(clamped), last);
       const p = clamped - scene;
 
+      const want = frameAt(timeline) - 1;
+      // The frame under the scroll position jumps the queue.
+      if (!images[want]) {
+        enqueue(want, true);
+        pump();
+      }
+
       ctx.fillStyle = "#100c08";
       ctx.fillRect(0, 0, cw, ch);
 
-      const base = nearestLoaded(sequences[scene], frameFor(sequences[scene], p));
-      if (base) drawCover(base, scaleFor(scene, p), 1);
+      const base = nearestLoaded(want);
+      if (base) drawCover(base, 1, px, py);
 
-      // Cross-dissolve into the next scene's first frame over the last `handoff`.
+      // Every scene boundary is a hard cut in the footage; dissolve across it
+      // over the last sliver of the outgoing scene so scrolling never snaps.
       if (p > 1 - handoff && scene < last) {
         const t = smoothstep(clamp01((p - (1 - handoff)) / handoff));
-        const nextSeq = sequences[scene + 1];
-        const incoming = nearestLoaded(nextSeq, 0);
-        if (incoming) drawCover(incoming, scaleFor(scene + 1, 0), t);
+        const incoming = nearestLoaded(SCENES[scene + 1].range[0] - 1);
+        if (incoming) drawCover(incoming, t, px, py);
       }
 
       prioritise(scene);
     };
 
-    renderRef.current = (timeline: number) => {
-      if (!needsDraw && Math.abs(timeline - lastTimeline) < 0.0002) return;
+    renderRef.current = (timeline: number, px = 0, py = 0) => {
+      if (
+        !needsDraw &&
+        Math.abs(timeline - lastTimeline) < 0.0002 &&
+        Math.abs(px - lastPx) < 0.002 &&
+        Math.abs(py - lastPy) < 0.002
+      )
+        return;
       lastTimeline = timeline;
+      lastPx = px;
+      lastPy = py;
       needsDraw = false;
-      paint(timeline);
+      paint(timeline, px, py);
     };
 
     // Take over only once every scene can show something.
-    const firstFramesReady = () => sequences.every((s) => s.images[0]);
+    const firstFramesReady = () => SCENES.every((s) => images[s.range[0] - 1]);
     const watch = window.setInterval(() => {
       if (cancelled) return;
       if (firstFramesReady()) {
@@ -258,11 +260,11 @@ export function useFrameScrub(
       renderRef.current = () => {};
       setReady(false);
     };
-  }, [canvasRef, enabled, handoff, zoom]);
+  }, [canvasRef, enabled, handoff, parallax]);
 
   return {
     ready,
-    render: (timeline: number) => renderRef.current(timeline),
+    render: (timeline, px, py) => renderRef.current(timeline, px, py),
   };
 }
 

@@ -1,18 +1,25 @@
 import Verse from "@/components/Verse";
+import SplitText from "@/components/reactbits/SplitText";
+import ScrambledText from "@/components/reactbits/ScrambledText";
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
 
 export default function ThePractice() {
   return (
     <section id="practice" data-scene="2" className="section">
       <div className="pin pin--center">
-        <div className="scrim scrim--left" />
         <div className="container container--end">
           <div style={{ maxWidth: 820, width: "100%" }}>
-            <div className="label">II · The practice</div>
-            <h2 className="h2 h2--tight" style={{ maxWidth: "14ch", marginBottom: 38 }}>
+            <ScrambledText as="div" className="label">II · The practice</ScrambledText>
+            <SplitText
+              as="h2"
+              className="h2 h2--tight"
+              style={{ maxWidth: "14ch", marginBottom: 38 }}
+              at="scroll"
+            >
               Four ways we draw the bow.
-            </h2>
+            </SplitText>
             <div className="grid grid--practice">
-              <div className="card">
+              <SpotlightCard className="card">
                 <div className="card__number">01</div>
                 <div className="card__label">We build</div>
                 <p className="card__body">
@@ -30,8 +37,8 @@ export default function ThePractice() {
                   </a>
                   , open-source codebase intelligence. The next one is unnamed.
                 </p>
-              </div>
-              <div className="card">
+              </SpotlightCard>
+              <SpotlightCard className="card">
                 <div className="card__number">02</div>
                 <div className="card__label">We advise</div>
                 <p className="card__body">
@@ -39,8 +46,8 @@ export default function ThePractice() {
                   evaluation, agent platforms. Hands-on experience from inside a
                   Fortune 500 build, brought to companies that need it to work.
                 </p>
-              </div>
-              <div className="card">
+              </SpotlightCard>
+              <SpotlightCard className="card">
                 <div className="card__number">03</div>
                 <div className="card__label">We partner</div>
                 <p className="card__body">
@@ -48,8 +55,8 @@ export default function ThePractice() {
                   eye toward deploying the right ones inside the enterprises our
                   partners serve. The architects in the room when it has to ship.
                 </p>
-              </div>
-              <div className="card">
+              </SpotlightCard>
+              <SpotlightCard className="card">
                 <div className="card__number">04</div>
                 <div className="card__label">We back</div>
                 <p className="card__body">
@@ -57,7 +64,7 @@ export default function ThePractice() {
                   company. Architecture, people, introductions, launch, hours. A
                   small agreed stake. Capital as the portfolio earns it.
                 </p>
-              </div>
+              </SpotlightCard>
             </div>
             <div style={{ marginTop: 30 }}>
               <Verse

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Magnet from "@/components/reactbits/Magnet";
 
 const LINKS = [
   { href: "#promise", label: "The Promise" },
@@ -36,9 +37,11 @@ export default function Nav() {
               </a>
             ))}
           </div>
-          <a href="#apply" className="nav__cta">
-            Apply →
-          </a>
+          <Magnet padding={36} magnetStrength={6}>
+            <a href="#apply" className="nav__cta" data-cursor="Apply">
+              Apply →
+            </a>
+          </Magnet>
           <button
             type="button"
             className="nav__burger"

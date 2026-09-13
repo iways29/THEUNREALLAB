@@ -201,6 +201,7 @@ a:hover {
 }
 
 .nav__link {
+  position: relative;
   white-space: nowrap;
   font-family: var(--serif);
   font-style: italic;
@@ -214,6 +215,28 @@ a:hover {
 .nav__link:hover {
   opacity: 1;
   color: var(--paper);
+}
+
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease);
+}
+
+.nav__link:hover::after,
+.nav__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.nav__link.is-active {
+  opacity: 1;
 }
 
 .nav__cta {
@@ -327,25 +350,36 @@ a:hover {
   z-index: 1;
 }
 
-/* Scroll travel each scene gets on top of its one viewport of content.
-   This is the Phase 2 scrub budget: more travel, slower camera. */
+/* Scroll travel each scene gets on top of its one viewport of content: the
+   film's scrub budget. Shorter than a full viewport so the copy of one scene
+   is still leaving as the next arrives, and the page reads as one flow. */
 :root {
-  --scene-travel: 100vh;
+  --scene-travel: 70vh;
 }
 
 .section {
   position: relative;
   min-height: calc(100vh + var(--scene-travel));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* The content stays pinned for the length of the section while the scene
-   underneath scrubs, so the camera moves as far as the user scrolls. */
+.section--hero {
+  justify-content: flex-start;
+}
+
+.section--end {
+  justify-content: flex-end;
+}
+
+/* Nothing is pinned. A block scrolls through at the page's own speed, the
+   choreography lifts and fades it at the viewport edges, and the film keeps
+   moving underneath the whole time. */
 .pin {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
+  position: relative;
+  width: 100%;
   display: flex;
-  overflow: hidden;
 }
 
 .pin--center {
@@ -353,72 +387,36 @@ a:hover {
 }
 
 .pin--bottom {
+  min-height: 100vh;
   align-items: flex-end;
 }
 
 .pin--column {
+  min-height: 100vh;
   flex-direction: column;
   justify-content: flex-end;
 }
 
-.scrim {
+/* One veil over the stage. Its dark focus is a CSS variable SceneEngine
+   slides between scenes, so the ink behind the copy travels instead of
+   switching sides at a cut. Bottom-weighted at rest so the page reads
+   without the script. */
+.veil {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.scrim--up {
-  background: linear-gradient(
-    to top,
-    rgba(16, 12, 8, 0.94) 0%,
-    rgba(16, 12, 8, 0.6) 40%,
-    rgba(16, 12, 8, 0) 70%
-  );
-}
-
-.scrim--right {
-  background: linear-gradient(
-    to right,
-    rgba(16, 12, 8, 0.88) 0%,
-    rgba(16, 12, 8, 0.55) 50%,
-    rgba(16, 12, 8, 0.05) 100%
-  );
-}
-
-.scrim--left {
-  background: linear-gradient(
-    to left,
-    rgba(16, 12, 8, 0.9) 0%,
-    rgba(16, 12, 8, 0.6) 55%,
-    rgba(16, 12, 8, 0.05) 100%
-  );
-}
-
-.scrim--room {
-  background: linear-gradient(
-    to top,
-    rgba(16, 12, 8, 0.92) 0%,
-    rgba(16, 12, 8, 0.5) 50%,
-    rgba(16, 12, 8, 0.1) 100%
-  );
-}
-
-.scrim--fund {
-  background: linear-gradient(
-    to right,
-    rgba(16, 12, 8, 0.9) 0%,
-    rgba(16, 12, 8, 0.55) 55%,
-    rgba(16, 12, 8, 0.05) 100%
-  );
-}
-
-.scrim--conch {
-  background: linear-gradient(
-    to top,
-    rgba(16, 12, 8, 0.96) 0%,
-    rgba(16, 12, 8, 0.6) 45%,
-    rgba(16, 12, 8, 0.05) 100%
-  );
+  --vx: 50%;
+  --vy: 108%;
+  background:
+    radial-gradient(
+      115% 100% at var(--vx) var(--vy),
+      rgba(16, 12, 8, 0.93) 0%,
+      rgba(16, 12, 8, 0.68) 34%,
+      rgba(16, 12, 8, 0.22) 68%,
+      rgba(16, 12, 8, 0.06) 100%
+    ),
+    linear-gradient(to top, rgba(16, 12, 8, 0.6) 0%, rgba(16, 12, 8, 0) 42%),
+    linear-gradient(to bottom, rgba(16, 12, 8, 0.4) 0%, rgba(16, 12, 8, 0) 26%);
 }
 
 .container {
@@ -429,8 +427,17 @@ a:hover {
   padding: var(--band) var(--gutter);
 }
 
+/* The chapter rail lives in the right gutter on wide screens. */
+@media (min-width: 1024px) {
+  .container {
+    padding-right: calc(var(--gutter) + 72px);
+  }
+}
+
 .container--hero {
-  padding: clamp(100px, 16vh, 140px) var(--gutter) clamp(44px, 7vh, 88px);
+  perspective: 1400px;
+  padding-top: clamp(100px, 16vh, 140px);
+  padding-bottom: clamp(44px, 7vh, 88px);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(28px, 4vw, 64px);
@@ -450,7 +457,8 @@ a:hover {
 }
 
 .container--conch {
-  padding: clamp(140px, 18vh, 220px) var(--gutter) clamp(48px, 7vh, 80px);
+  padding-top: clamp(140px, 18vh, 220px);
+  padding-bottom: clamp(48px, 7vh, 80px);
 }
 
 /* ── type ───────────────────────────────────────────────────── */
@@ -578,7 +586,6 @@ a:hover {
 }
 
 .button:hover {
-  transform: translateY(-3px);
   color: var(--ink);
 }
 
@@ -605,8 +612,15 @@ a:hover {
 
 /* ── verse ──────────────────────────────────────────────────── */
 
-.verse-card {
+.hero__aside {
   justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(20px, 3vh, 36px);
+}
+
+.verse-card {
   max-width: 420px;
   padding: 28px 30px;
   border: 1px solid var(--rule-card);
@@ -620,6 +634,23 @@ a:hover {
   font-size: clamp(18px, 1.5vw, 22px);
   line-height: 1.7;
   color: var(--paper);
+}
+
+/* The Sanskrit inks in from the left: SceneEngine writes --ink each frame.
+   With no script it is fully inked, so the verse always reads. */
+.verse-card__deva,
+.verse__deva {
+  --ink: 1;
+  background-image: linear-gradient(
+    100deg,
+    var(--paper) 0%,
+    var(--paper) calc(var(--ink) * 100%),
+    rgba(244, 239, 228, 0.16) calc(var(--ink) * 100% + 16%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .verse-card__gloss {
@@ -763,6 +794,20 @@ a:hover {
   gap: 20px;
   padding: 18px 0;
   border-bottom: 1px solid var(--rule-row);
+  transition: padding-left 0.45s var(--ease), border-color 0.45s ease;
+}
+
+.row:hover {
+  padding-left: 14px;
+  border-color: var(--gold);
+}
+
+.row__name {
+  transition: color 0.3s ease;
+}
+
+.row:hover .row__name {
+  color: var(--gold);
 }
 
 .row__name {
@@ -896,48 +941,6 @@ a:hover {
   opacity: 0;
 }
 
-/* ── custom cursor ──────────────────────────────────────────── */
-
-html.has-cursor,
-html.has-cursor body,
-html.has-cursor a,
-html.has-cursor button {
-  cursor: none;
-}
-
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  z-index: 9999;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(244, 239, 228, 0.75);
-  z-index: 9998;
-  pointer-events: none;
-  will-change: transform;
-  transition: width 0.25s, height 0.25s, background 0.25s;
-}
-
-.cursor-ring.is-over {
-  width: 64px;
-  height: 64px;
-  background: rgba(230, 199, 106, 0.18);
-}
-
 /* ── reduced motion: static posters, no parallax or drift ───── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -960,37 +963,525 @@ html.has-cursor button {
     transition: none;
   }
 
-  .button:hover {
+  .glare-hover:hover {
     transform: none;
   }
 
-  .stage__videos {
-  position: absolute;
-  inset: 0;
-  transition: opacity 0.6s ease;
+  .stage__layer {
+    transform: none !important;
+  }
+
+  .particles,
+  .click-spark,
+  .splash {
+    display: none;
+  }
+
+  .shiny-gold {
+    animation: none;
+    color: var(--gold);
+    -webkit-text-fill-color: var(--gold);
+  }
+
+  .verse__deva,
+  .verse-card__deva {
+    --ink: 1;
+  }
 }
 
-/* Once the scrub canvas has frames for every scene it takes the stage. */
-.scrub-ready .stage__videos {
+/* ── split text (ReactBits SplitText, gsap masks) ───────────── */
+
+/* gsap wraps each word in an overflow-clipped mask while it rises. The
+   italic Caslon overhangs and descends past its box, so the mask is padded
+   out and pulled back with negative margins to leave the layout alone. */
+.split-word-mask {
+  padding: 0.08em 0.14em 0.22em 0.1em;
+  margin: -0.08em -0.14em -0.22em -0.1em;
+}
+
+.split-word {
+  will-change: transform;
+}
+
+.h1__text {
+  display: inline;
+}
+
+/* ── shine on the gold word (ReactBits ShinyText, CSS) ──────── */
+
+.shiny-gold {
+  background-image: linear-gradient(
+    110deg,
+    var(--gold) 0%,
+    var(--gold) 42%,
+    #fff1b8 50%,
+    var(--gold) 58%,
+    var(--gold) 100%
+  );
+  background-size: 260% 100%;
+  background-position: 120% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shine 7.5s cubic-bezier(0.4, 0, 0.2, 1) 2.2s infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 120% 0;
+  }
+  32% {
+    background-position: -120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+/* ── spotlight (ReactBits SpotlightCard) ────────────────────── */
+
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(230, 199, 106, 0.16);
+}
+
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    380px circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 70%
+  );
   opacity: 0;
+  transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
-.stage__canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.scrub-ready .stage__canvas {
+.card-spotlight:hover::before,
+.card-spotlight:focus-within::before {
   opacity: 1;
 }
 
-.stage__layer {
-    transform: none !important;
+.card-spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── glare (ReactBits GlareHover) ───────────────────────────── */
+
+.glare-hover {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  transition: transform 0.35s var(--ease);
+}
+
+.glare-hover:hover {
+  transform: translateY(-3px);
+}
+
+.glare-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--gh-angle, -35deg),
+    transparent 58%,
+    var(--gh-rgba, rgba(230, 199, 106, 0.55)) 70%,
+    transparent 82%
+  );
+  background-size: var(--gh-size, 260%) var(--gh-size, 260%);
+  background-repeat: no-repeat;
+  background-position: -100% -100%;
+  transition: background-position var(--gh-duration, 700ms) ease;
+}
+
+.glare-hover:hover::before {
+  background-position: 100% 100%;
+}
+
+/* ── body copy ink-in (ReactBits ScrollReveal) ──────────────── */
+
+.reveal-word {
+  display: inline;
+  will-change: opacity;
+}
+
+/* ── gold dust (ReactBits Particles, OGL) ───────────────────── */
+
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.particles canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── click sparks (ReactBits ClickSpark) ────────────────────── */
+
+.click-spark {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  pointer-events: none;
+}
+
+/* ── the archer's aim (ReactBits TargetCursor) ──────────────── */
+
+html.has-cursor,
+html.has-cursor body,
+html.has-cursor a,
+html.has-cursor button {
+  cursor: none;
+}
+
+.target-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.target-cursor-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: translate(-50%, -50%) rotate(45deg);
+  will-change: transform;
+}
+
+.target-cursor-corner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--paper);
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.corner-tl {
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.corner-tr {
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.corner-br {
+  border-left: 0;
+  border-top: 0;
+}
+
+.corner-bl {
+  border-right: 0;
+  border-top: 0;
+}
+
+.target-cursor-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(14px, 12px);
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/* ── chapter rail ───────────────────────────────────────────── */
+
+.rail {
+  position: fixed;
+  right: clamp(18px, 2.4vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.rail__track {
+  position: absolute;
+  right: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 1px;
+  background: var(--rule);
+}
+
+.rail__dot {
+  position: absolute;
+  right: -3px;
+  top: calc(var(--t, 0) * 100%);
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.rail__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 16px;
+  text-decoration: none;
+  color: var(--paper);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.rail__item:hover,
+.rail__item.is-active {
+  opacity: 1;
+  color: var(--paper);
+}
+
+.rail__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.3s ease, transform 0.4s var(--ease);
+}
+
+.rail:hover .rail__name,
+.rail__item.is-active .rail__name {
+  opacity: 1;
+  transform: none;
+}
+
+.rail__tick {
+  display: block;
+  width: 16px;
+  height: 1px;
+  background: var(--paper);
+  transition: width 0.4s var(--ease), background 0.3s ease;
+}
+
+.rail__item.is-active .rail__tick {
+  width: 32px;
+  background: var(--gold);
+}
+
+/* ── frame counter ──────────────────────────────────────────── */
+
+.frame-counter {
+  position: fixed;
+  left: clamp(20px, 4vw, 56px);
+  bottom: 20px;
+  z-index: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--body);
+  opacity: 0.72;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.frame-counter__scene {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--paper);
+}
+
+.frame-counter b {
+  font-weight: 500;
+  color: var(--gold);
+}
+
+@media (max-width: 1023px) {
+  .rail {
+    display: none;
   }
+}
+
+@media (max-width: 767px) {
+  .frame-counter,
+  .seal {
+    display: none;
+  }
+
+  /* The hero stack is taller than a phone viewport: flow it under the nav
+     instead of anchoring it to the bottom and pushing the eyebrow off. */
+  .pin--bottom {
+    min-height: 0;
+    align-items: flex-start;
+  }
+
+  .container--hero {
+    padding-top: 112px;
+  }
+}
+
+/* ── seal (ReactBits CircularText) ──────────────────────────── */
+
+.seal {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin-left: 4px;
+}
+
+.seal__ring {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.seal__ring span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  text-align: center;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--body);
+  line-height: 1;
+  padding-top: 2px;
+  transform-origin: 50% 50%;
+}
+
+.seal__core {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.seal__core .diamond {
+  width: 9px;
+  height: 9px;
+}
+
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid var(--rule-card);
+  border-radius: 50%;
+}
+
+/* ── ribbon (ReactBits ScrollVelocity) ──────────────────────── */
+
+.ribbon {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: clamp(28px, 8vh, 96px);
+  padding: 8px 0;
+  border-top: 1px solid var(--rule-hair);
+  border-bottom: 1px solid var(--rule-hair);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.ribbon__scroller {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.ribbon__copy {
+  flex: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(30px, 4.6vw, 72px);
+  line-height: 1.25;
+  color: var(--paper);
+  opacity: 0.42;
+  padding-right: 0.6em;
+}
+
+/* ── variable proximity (ReactBits VariableProximity) ───────── */
+
+.vp-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.vp-char {
+  display: inline-block;
+  font-variation-settings: "wght" 400, "wdth" 100;
+}
+
+/* ── edge blur (ReactBits GradualBlur) ──────────────────────── */
+
+.gradual-blur {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 600;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.gradual-blur--bottom {
+  bottom: 0;
+}
+
+.gradual-blur--top {
+  top: 0;
+}
+
+@media (max-width: 767px) {
+  .gradual-blur {
+    display: none;
+  }
+}
+
+/* ── incense (ReactBits SplashCursor) ───────────────────────── */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+.splash canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
 }

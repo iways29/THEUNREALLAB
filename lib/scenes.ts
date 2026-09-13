@@ -1,74 +1,102 @@
-/** One scene per section, in scroll order. Assets live in /public/scenes. */
+/**
+ * One scene per section, in scroll order.
+ *
+ * The stage is a single 1017-frame sequence extracted from the merged 78s
+ * film (13 fps). Each scene owns a contiguous frame range; the cuts between
+ * them are hard cuts in the footage, so the scrub cross-dissolves a hair over
+ * each boundary. Posters and clips remain as the no-canvas fallback.
+ */
 export type Scene = {
   /** Section anchor this scene is bound to. */
   id: string;
   /** Asset basename under /public/scenes. */
   slug: string;
-  /** Poster still, shown before the clip plays and under prefers-reduced-motion. */
+  /** Short caption for the chapter rail and frame counter. */
+  title: string;
+  /** Poster still, shown before the canvas is ready and under reduced motion. */
   poster: string;
-  /** Looping entry clip (Phase 1). */
+  /** Looping clip, played only if the canvas never becomes ready. */
   clip: string;
-  /**
-   * Phase 2: continuation clip that picks up on the entry clip's last frame and
-   * carries the camera into the next scene. Null until the render lands.
-   */
-  exitClip: string | null;
-  /**
-   * Phase 2: scrubbable frame sequence. `count` frames numbered from 0001;
-   * the entry clip's frames run first, the exit clip's continue the count.
-   */
-  frames: { dir: string; count: number } | null;
+  /** Inclusive 1-based frame range in the global sequence. */
+  range: [number, number];
 };
+
+/** The global frame sequence. `count` frames numbered 0001…, in `dir`. */
+export const FRAMES = {
+  dir: "/frames",
+  smallDir: "/frames-sm",
+  count: 1017,
+  pad: 4,
+  ext: "webp",
+  /** Source frame rate; only used to derive the timecode readout. */
+  fps: 13,
+} as const;
 
 export const SCENES: Scene[] = [
   {
     id: "top",
     slug: "00-chariot",
+    title: "The chariot",
     poster: "/scenes/00-chariot.jpg",
     clip: "/scenes/00-chariot.mp4",
-    exitClip: "/scenes/00-chariot-exit.mp4",
-    frames: { dir: "/frames/00-chariot", count: 41 },
+    range: [1, 170],
   },
   {
     id: "promise",
     slug: "01-counsel",
+    title: "The counsel",
     poster: "/scenes/01-counsel.jpg",
     clip: "/scenes/01-counsel.mp4",
-    exitClip: "/scenes/01-counsel-exit.mp4",
-    frames: { dir: "/frames/01-counsel", count: 41 },
+    range: [171, 339],
   },
   {
     id: "practice",
     slug: "02-bow",
+    title: "The bow",
     poster: "/scenes/02-bow.jpg",
     clip: "/scenes/02-bow.mp4",
-    exitClip: "/scenes/02-bow-exit.mp4",
-    frames: { dir: "/frames/02-bow", count: 65 },
+    range: [340, 509],
   },
   {
     id: "room",
     slug: "03-assembly",
+    title: "The assembly",
     poster: "/scenes/03-assembly.jpg",
     clip: "/scenes/03-assembly.mp4",
-    exitClip: "/scenes/03-assembly-exit.mp4",
-    frames: { dir: "/frames/03-assembly", count: 45 },
+    range: [510, 679],
   },
   {
     id: "fund",
     slug: "04-raigad",
+    title: "Raigad",
     poster: "/scenes/04-raigad.jpg",
     clip: "/scenes/04-raigad.mp4",
-    exitClip: "/scenes/04-raigad-exit.mp4",
-    frames: { dir: "/frames/04-raigad", count: 38 },
+    range: [680, 848],
   },
   {
     id: "apply",
     slug: "05-conch",
+    title: "The conch",
     poster: "/scenes/05-conch.jpg",
     clip: "/scenes/05-conch.mp4",
-    exitClip: "/scenes/05-conch-exit.mp4",
-    frames: { dir: "/frames/05-conch", count: 44 },
+    range: [849, 1017],
   },
 ];
+
+export const frameUrl = (n: number, small = false) =>
+  `${small ? FRAMES.smallDir : FRAMES.dir}/${String(n).padStart(FRAMES.pad, "0")}.${FRAMES.ext}`;
+
+/**
+ * Frame number (1-based) for a timeline position in [0, SCENES.length], where
+ * the integer part is the scene and the fraction is progress through it.
+ */
+export function frameAt(timeline: number): number {
+  const last = SCENES.length - 1;
+  const clamped = Math.max(0, Math.min(timeline, last + 0.999999));
+  const scene = Math.min(Math.floor(clamped), last);
+  const p = clamped - scene;
+  const [start, end] = SCENES[scene].range;
+  return start + Math.round(p * (end - start));
+}
 
 export const EMAIL = "ishanpanchaal@theunreallab.com";

@@ -118,8 +118,14 @@ export default function SplashCursor({
       COLOR
     };
 
-    const { gl, ext } = getWebGLContext(canvas);
-    if (!gl || !ext) return;
+    // No WebGL (headless, VMs, blocklisted GPUs) must never take the page down:
+    // the splash is decoration, so skip it rather than throw into the error boundary.
+    const context = getWebGLContext(canvas);
+    if (!context) {
+      console.warn('[SplashCursor] WebGL unavailable, skipping fluid simulation');
+      return;
+    }
+    const { gl, ext } = context;
 
     if (!ext.supportLinearFiltering) {
       config.DYE_RESOLUTION = 256;
@@ -142,9 +148,7 @@ export default function SplashCursor({
           canvas.getContext('experimental-webgl', params)) as WebGL2RenderingContext | null;
       }
 
-      if (!gl) {
-        throw new Error('Unable to initialize WebGL.');
-      }
+      if (!gl) return null;
 
       const isWebGL2 = 'drawBuffers' in gl;
 
@@ -189,9 +193,7 @@ export default function SplashCursor({
         formatR = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
       }
 
-      if (!formatRGBA || !formatRG || !formatR) {
-        throw new Error('Unable to initialize WebGL render texture formats.');
-      }
+      if (!formatRGBA || !formatRG || !formatR) return null;
 
       return {
         gl,
